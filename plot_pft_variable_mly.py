@@ -36,23 +36,27 @@ scale to the range for only that PFT.''')
   group.add_argument('-n', '--normal', action="store_true")
   group.add_argument('-e', '--explorer', action="store_true")
 
-
   parser.add_argument('-d', '--display', action='store_true', help="Display the plot")
   parser.add_argument('-s', '--save', default=False, help="Save the plot to simple-plot.png")
+
   parser.add_argument('-c', '--cohort', required=True, type=int, help='Which cohort to plot')
   parser.add_argument('-v', '--variable', default='NPP', help="Which variable to plot")
-  parser.add_argument('inputfile', help='the file to read from')
+
+  parser.add_argument('inputfile', help='path to a NetCDF file to read from (A).')
+  parser.add_argument('--compare', default=None, help='path to a NetCDF file to compare to (B).')
 
   args = parser.parse_args()
   #print args
   
   print "Loading dataset..."
-  ds = nc.Dataset(args.inputfile)
+  dsA = nc.Dataset(args.inputfile)
+  if (args.compare != None):
+    dsB = nc.Dataset(args.compare)
   
   var = args.variable
   
-  time_range = np.arange(0, len(ds.dimensions['YYYYMM']))  
-  num_pfts = len(ds.dimensions['PFTS'])
+  time_range = np.arange(0, len(dsA.dimensions['YYYYMM']))  
+  num_pfts = len(dsA.dimensions['PFTS'])
 
   plt.rcParams['figure.figsize'] = 9, 12 # w, h
 
@@ -63,27 +67,45 @@ scale to the range for only that PFT.''')
   covaxesarr = [axe.twinx() for axe in axesarr]
    
   fig.subplots_adjust(hspace=.5)
-  fig.suptitle('%s cohort %s'%(var, args.cohort), fontsize=20)
+  if args.compare:
+    t = '''%s cohort %s
+    (A) %s 
+    (B) %s''' % (var, args.cohort, args.inputfile, args.compare)
+  else:
+    t = '''%s cohort %s
+    %s''' % (var, args.cohort, args.inputfile)
+  
+  fig.suptitle(t)
 
   print "Extracting data for each PFT..."
   for pft in range(num_pfts):
     # pull some data out to plot
-    pft_series = ds.variables[var][args.cohort, :, pft]
-    pft_cov = 100*ds.variables['VEGFRAC'][args.cohort, :, pft]
+    pft_data_seriesA = dsA.variables[var][args.cohort, :, pft]
+    if args.compare:
+      pft_data_seriesB = dsB.variables[var][args.cohort, :, pft]
 
+    pft_coverageA = 100*dsA.variables['VEGFRAC'][args.cohort, :, pft]
+    if args.compare:
+      pft_coverageB = 100*dsB.variables['VEGFRAC'][args.cohort, :, pft]
+    
     # Axes instances to work with cax -> "current axes"
     cax1 = axesarr[pft]    # the variable data axes
     cax2 = covaxesarr[pft] # the coverage data axes
 
     # plot the PFT's variable data vs time
-    cax1.plot(time_range, pft_series, 'b', label='pft%s'%pft)
+    cax1.plot(time_range, pft_data_seriesA, 'b', label='(A) pft%i'%pft)
+    if args.compare:
+      cax1.plot(time_range, pft_data_seriesB, 'b', linestyle='.', label='(B) pft%i'%pft)
+
     # set tick colors
     for tl in cax1.get_yticklabels():
       tl.set_color('b')
       tl.set_size(10)
 
     # plot the PFT's coverage data vs time (x axis is shared)
-    cax2.plot(time_range, pft_cov, linestyle=':', color='0.75', label='pft%s cov'%pft)
+    cax2.plot(time_range, pft_coverageA, color='0.75', label='(A) pft%i cov'%pft)
+    if args.compare:
+      cax2.plot(time_range, pft_coverageB, linestyle='.', color='0.75', label='(B) pft%i cov'%pft)
     # set tick colors
     for tl in cax2.get_yticklabels():
       tl.set_color('0.0')
@@ -103,22 +125,30 @@ scale to the range for only that PFT.''')
   # done looping setting up individual plots...
   if (args.normal):
     print "Finding the 'global' max and min..."
-    maxes = [max(ds.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
-    mx = max(maxes)
+    maxesA = [max(dsA.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
+    if args.compare:
+      maxesB = [max(dsB.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
+      mx = max(max(maxesA),max(maxesB))
+    else:
+      mx = max(maxesA)
 
-    mins = [min(ds.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
-    mn = min(mins)
+    minsA = [min(dsA.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
+    if args.compare:
+      minsB = [min(dsB.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
+      mn = min(min(minsA), min(minsA))
+    else:
+      mn = min(minsA)
 
     print "Looping over the axes instance array and setting tick marks..."
     for cax in axesarr:
       cax.yaxis.set_major_locator(plt.MaxNLocator(4))
-      cax.set_yticks(np.arange(mn, mx+1, (abs(mx-mn)/4) ) )
+      #cax.set_yticks(np.arange(mn, mx+1, (abs(mx-mn)/4) ) )
          
   
   # set the x axis label. this labels only the bottom plot,
   # but all the other plots get tick marks.
   # have it make tick marks at year boundaries (every 12 months)
-  plt.xticks(np.arange(0,len(ds.dimensions['YYYYMM']),12) )
+  plt.xticks(np.arange(0,len(dsA.dimensions['YYYYMM']),12) )
   
   # for some reason plt.xlabel('blah') does nothing, so to put on the 
   # label at the bottom of the plot, we simply add it to the last 
