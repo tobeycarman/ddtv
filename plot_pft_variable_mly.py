@@ -53,6 +53,8 @@ scale to the range for only that PFT.''')
   if (args.compare != None):
     dsB = nc.Dataset(args.compare)
   
+  print '(A): ', args.inputfile
+  print '(B): ', args.compare 
   var = args.variable
   
   time_range = np.arange(0, len(dsA.dimensions['YYYYMM']))  
@@ -73,7 +75,7 @@ scale to the range for only that PFT.''')
     (B) %s''' % (var, args.cohort, args.inputfile, args.compare)
   else:
     t = '''%s cohort %s
-    %s''' % (var, args.cohort, args.inputfile)
+    (A) %s''' % (var, args.cohort, args.inputfile)
   
   fig.suptitle(t)
 
@@ -84,18 +86,29 @@ scale to the range for only that PFT.''')
     if args.compare:
       pft_data_seriesB = dsB.variables[var][args.cohort, :, pft]
 
-    pft_coverageA = 100*dsA.variables['VEGFRAC'][args.cohort, :, pft]
+    pft_coverageA = 100 * dsA.variables['VEGFRAC'][args.cohort, :, pft]
     if args.compare:
-      pft_coverageB = 100*dsB.variables['VEGFRAC'][args.cohort, :, pft]
+      pft_coverageB = 100 * dsB.variables['VEGFRAC'][args.cohort, :, pft]
+    
+    #np.set_printoptions(precision=3)
+    #print '(A) ', pft_data_seriesA[0:10]
+    #if args.compare:
+    #  print '(B) ', pft_data_seriesB[0:10]
+    #print 
+    ## put back defaults.
+    #np.set_printoptions(edgeitems=3,infstr='inf',
+    #    linewidth=75, nanstr='nan', precision=8,
+    #    suppress=False, threshold=1000)#, formatter=None)<- unexpected keyword error?
+    
     
     # Axes instances to work with cax -> "current axes"
     cax1 = axesarr[pft]    # the variable data axes
     cax2 = covaxesarr[pft] # the coverage data axes
 
     # plot the PFT's variable data vs time
-    cax1.plot(time_range, pft_data_seriesA, 'b', label='(A) pft%i'%pft)
+    cax1.plot(time_range, pft_data_seriesA, 'b-', label='(A) pft%i'%pft)
     if args.compare:
-      cax1.plot(time_range, pft_data_seriesB, 'b', linestyle='.', label='(B) pft%i'%pft)
+      cax1.plot(time_range, pft_data_seriesB, 'r-', label='(B) pft%i'%pft)
 
     # set tick colors
     for tl in cax1.get_yticklabels():
@@ -103,9 +116,9 @@ scale to the range for only that PFT.''')
       tl.set_size(10)
 
     # plot the PFT's coverage data vs time (x axis is shared)
-    cax2.plot(time_range, pft_coverageA, color='0.75', label='(A) pft%i cov'%pft)
+    cax2.plot(time_range, pft_coverageA, linestyle=':', color='b', label='(A) pft%i cov'%pft)
     if args.compare:
-      cax2.plot(time_range, pft_coverageB, linestyle='.', color='0.75', label='(B) pft%i cov'%pft)
+      cax2.plot(time_range, pft_coverageB, linestyle=':', color='r', label='(B) pft%i cov'%pft)
     # set tick colors
     for tl in cax2.get_yticklabels():
       tl.set_color('0.0')
@@ -124,26 +137,36 @@ scale to the range for only that PFT.''')
 
   # done looping setting up individual plots...
   if (args.normal):
-    print "Finding the 'global' max and min..."
+    print "Finding the max for each pft..."
+
+
     maxesA = [max(dsA.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
+    print "Maxes from file A: ", ['%.3f' % val for val in maxesA]
     if args.compare:
       maxesB = [max(dsB.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
+      print "Maxes from file B: ", ['%.3f' % val for val in maxesB]
       mx = max(max(maxesA),max(maxesB))
     else:
       mx = max(maxesA)
 
     minsA = [min(dsA.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
+    print "Mins from file A: ", ['%.3f' % val for val in minsA]
+
     if args.compare:
       minsB = [min(dsB.variables[var][args.cohort, :, pft]) for pft in range(num_pfts)]
-      mn = min(min(minsA), min(minsA))
+      print "Mins from file B: ", ['%.3f' % val for val in minsB]
+      mn = min(min(minsA), min(minsB))
     else:
       mn = min(minsA)
-
-    print "Looping over the axes instance array and setting tick marks..."
+    
+    print "Overall min, max: ", mn, mx
+    print "Looping over the array of axes instances and setting tick marks..."
     for cax in axesarr:
       cax.yaxis.set_major_locator(plt.MaxNLocator(4))
-      #cax.set_yticks(np.arange(mn, mx+1, (abs(mx-mn)/4) ) )
+      cax.set_yticks(np.arange(mn, mx+1, (abs(mx-mn)/4) ) )
          
+
+  
   
   # set the x axis label. this labels only the bottom plot,
   # but all the other plots get tick marks.
