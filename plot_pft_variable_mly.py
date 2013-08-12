@@ -21,6 +21,7 @@ except ImportError as e:
   sys.exit()
 
 
+
 def main():
   parser = argparse.ArgumentParser(description='''Plots a variable vs. time for  
 each PFT in a cohort (left axis). The right axis plots the PFT's percent 
@@ -30,7 +31,39 @@ There are two modes: "normal" and "explorer".
 
 In "normal" mode, the min and max for each plot are determined by the min and 
 max among all PFTs. In "explorer" mode, the y axis of each PFT plot will auto-
-scale to the range for only that PFT.''')
+scale to the range for only that PFT.
+
+Plots like this (not showing right y axis and coverage for clarity):
+
+         cohort x, variable
+
+
+      ^                 x xx
+PFT1  |    x x         x x  x    xxx>
+      |   x   x    x  x      x xx
+      |  x     xxxx xx        x
+      +-x----------------------------->
+                 time (months)
+
+      ^                 x xx
+      |    x x         x x  x
+PFT2  |   x   x    x  x      x xx
+      |  x     xxxx xx        x  xx >
+      +-x--------------------------x-->
+                 time (months)
+ .
+ .
+
+      ^      xxx xxx    x xx
+PFTn  |    xx   x   x  x x  x    xxx>
+      |   x          xx      x xx
+      |  x                    x
+      +-x----------------------------->
+                 time (months)
+
+Link to continue working on ascii representation of plots:
+http://www.asciiflow.com/#Draw1054136659174578755/54679995
+''')
 
   group = parser.add_mutually_exclusive_group()
   group.add_argument('-n', '--normal', action="store_true")
