@@ -21,13 +21,40 @@ except ImportError as e:
   sys.exit()
 
 
+def stitch(cht, var, pft, infiles, comparefiles=None):
+  '''Grabs the right data from the input files (and compare files).
+  
+  Returns one (or two if comparing) 2d arrays with all the right data.'''
+
+  print "Loading dataset..."  
+  ds = nc.Dataset(infiles[0], 'r')
+  dataA = ds.variables[var][cht, :, pft]
+  for i in range(1, len(infiles)):
+    ds = nc.Dataset(infiles[i], 'r')
+    data = ds.variables[var][cht, :, pft]
+    dataA = np.append(dataA, data, axis=0)
+  
+  if comparefiles:
+    ds = nc.Dataset(comparefiles[0], 'r')
+    dataB = ds.variables[var][cht, :, pft]
+    for i in range(1, len(comparefiles)):
+      ds = nc.Dataset(comparefiles[i], 'r')
+      data = ds.variables[var][cht, :, pft]
+      dataB = np.append(dataB, data, axis=0)
+    return (dataA, dataB)  
+
+  return dataA
+
+
+
 def main():
   parser = argparse.ArgumentParser(description='''Makes a heatmap for a single
   variable, and a single PFT. The heatmap is a time vs. time heatmap with years
   on the vertical axis and months on the horizontal axis. The color of each
   pixel in this grid corresponds to the variables value at that month, and year.
   
-  This plot is good for looking at seasonal trends in longer time series data.
+  A similar to the example here:
+  http://stat-computing.org/dataexpo/2009/posters/wicklin-allison.pdf
   ''')
 
   #group = parser.add_mutually_exclusive_group()
@@ -41,22 +68,36 @@ def main():
   parser.add_argument('-v', '--variable', default='NPP', help="Which variable to plot")
   parser.add_argument('-pft', type=int, default=0, help="Which PFT to display data for.")
 
-  parser.add_argument('inputfile', help='path to a NetCDF file to read from (A).')
-  #parser.add_argument('--compare', default=None, help='path to a NetCDF file to compare to (B).')
+  parser.add_argument('inputfiles', nargs='+', help='path to one or more NetCDF file(s) to read from (A).')
+  parser.add_argument('--compare', nargs='+', default=None, help='path to one or more NetCDF file(s) to compare to (B).')
 
   args = parser.parse_args()
   print args
+
+  if args.compare:
+    dsA, dsB = stitch(cht=args.cohort, 
+                      var=args.variable, 
+                      pft=args.pft, 
+                      infiles=args.inputfiles,comparefiles=args.compare)
+  else:
+    dsA = stitch(cht=args.cohort, 
+                 var=args.variable, 
+                 pft=args.pft, 
+                 infiles=args.inputfiles)
+
+  # compare_plot() # needs two data arrays, one for each set of files to compare
+              # will produce plots with differetn color traces for the compare
+              # files
+
+  # plot() # <- will need data array, list of input files?
+  # save()
   
-  print "Loading dataset..."
-  dsA = nc.Dataset(args.inputfile)
-  #if (args.compare != None):
-  #  dsB = nc.Dataset(args.compare)
-  
-  print '(A): ', args.inputfile
+  print dsA
+  print '(A): ', args.inputfiles
   #print '(B): ', args.compare 
   args.variable
   
-  time_range = np.arange(0, len(dsA.dimensions['YYYYMM']))  
+  time_range = np.arange(0, len(dsA))  
   #num_pfts = len(dsA.dimensions['PFTS'])
 
   #plt.rcParams['figure.figsize'] = 9, 12 # w, h
@@ -67,16 +108,11 @@ def main():
   #fig.subplots_adjust(hspace=.5)
   #if args.compare:
   t = '''cohort %s, pft%s, %s
-    (A) %s''' % (args.cohort, args.pft, args.variable, args.inputfile)
+    (A) %s''' % (args.cohort, args.pft, args.variable, args.inputfiles)
   
   fig.suptitle(t)
-
-  print "Extracting data..."
-  data = dsA.variables[args.variable][args.cohort,:,args.pft]
-  print data
-  print len(data)
-  print data.shape
-  img_data = np.reshape(data, (data.shape[0]/12,12))
+  
+  img_data = np.reshape(dsA, (dsA.shape[0]/12,12))
   print img_data[0]
   print img_data[1]
   
