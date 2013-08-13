@@ -31,4 +31,9 @@ I have:
     wsgiref==0.1.2
     yolk==0.4.3
 
+Examples
+------------
+
+    $ ./heatmap_year_vs_month.py -s "examples/hm-polar1.png" -m polar -c 1 -pft 1 -v VEGC output-archives/after-phen/output-sp.nc
+![Alt text](examples/hm-polar1.png "Example polar plot")
 
