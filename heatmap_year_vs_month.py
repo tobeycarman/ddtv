@@ -113,22 +113,19 @@ def img_plot_polar_B(args, data):
       #print type(c)
       c = 1-c
       c = '%0.2f' % (c)
-      #print c      
-      bars.append(curax.bar((2*np.pi/12)*mi, 1, 
-                            width=2*np.pi/18,
-                            bottom=yi-1,
+      #print c
+      offset = data.shape[0]*0.5      
+      bars.append(curax.bar((2*np.pi/12)*mi, 1+offset, 
+                            width=2*np.pi/12,
+                            bottom=yi-1+offset,
                             color=c,                            
                             edgecolor=c,
                             #alpha=.75
                            )
                  )
 
-
-      
-      
-
-  plt.ylim(0,years)
-  #curax.set_yticks(np.arange(years))
+  plt.ylim(0,years+offset)
+  #plt.yticks(0+offset, np.arange(years+offset))
   #curax.set_xticks(months)
 
   wrapup(args)
@@ -229,17 +226,13 @@ def main():
                  pft=args.pft, 
                  infiles=args.inputfiles)
 
-  # compare_plot() # needs two data arrays, one for each set of files to compare
-              # will produce plots with differetn color traces for the compare
-              # files
-
-  # plot() # <- will need data array, list of input files?
-  # save()
-
   if args.compare:
     plot_compare(args, data=[dsA, dsB])
+    # compare_plot() # needs two data arrays, one for each set of files to compare
+            # will produce plots with differetn color traces for the compare
+            # files
+
   else:
-    print "WTFFFFF?"
     plot(args, data=dsA)
 
 
