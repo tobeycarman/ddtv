@@ -34,8 +34,11 @@ I have:
 Examples
 ------------
 
+    $ ./heatmap_year_vs_month.py -s "examples/hm-rect1.png" -m rect -c 1 -pft 1 -v VEGC output-archives/after-phen/output-tr.nc
+<img width=300px height=300px alt="Example polar plot" src="examples/hm-rect1.png" />
+
     $ ./heatmap_year_vs_month.py -s "examples/hm-polar1.png" -m polar -c 1 -pft 1 -v VEGC output-archives/after-phen/output-sp.nc
-![Alt text](examples/hm-polar1.png "Example polar plot")
+<img width=300px height=300px alt="Example polar plot" src="examples/hm-polar1.png" />
 
     $ ./plot_pft_variable_mly.py --explorer -s "examples/plot_pft_var1.png" --cohort 1 --variable VEGC output-archives/before-phen/output-sp.nc
 <img width=500px height=900px alt="An example pft variable plot" src="examples/plot_pft_var1.png" />
