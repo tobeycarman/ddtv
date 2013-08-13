@@ -37,3 +37,6 @@ Examples
     $ ./heatmap_year_vs_month.py -s "examples/hm-polar1.png" -m polar -c 1 -pft 1 -v VEGC output-archives/after-phen/output-sp.nc
 ![Alt text](examples/hm-polar1.png "Example polar plot")
 
+    $ ./plot_pft_variable_mly.py --explorer -s "examples/plot_pft_var1.png" --cohort 1 --variable VEGC output-archives/before-phen/output-sp.nc
+<img width=500px height=900px alt="An example pft variable plot" src="examples/plot_pft_var1.png" />
+
