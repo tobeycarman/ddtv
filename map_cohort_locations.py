@@ -30,8 +30,6 @@ def main():
   args = parser.parse_args()
   #print args
 
-  map = Basemap(resolution='c',projection='ortho',lat_0=60.,lon_0=-60.)
-
   cohortid = nc.Dataset(args.cohortid)
   grid = nc.Dataset(args.gridid)
   
@@ -45,6 +43,7 @@ def main():
   
   x,y = map(lons, lats)
   
+  map = Basemap(resolution='c',projection='ortho',lat_0=60.,lon_0=-60.)
   map.scatter(x, y)
   map.drawcoastlines() # draw coastlines
   map.drawparallels(np.arange(-90.,120.,30.),labels=[1,0,0,0]) # draw parallels
