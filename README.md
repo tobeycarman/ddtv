@@ -39,7 +39,8 @@ labeling the axes, titles, etc., but this should give an idea of what the script
 can generate.
 
 
-    $ ./heatmap_year_vs_month.py -s "examples/hm-rect1.png" -m rect -c 1 -pft 1 -v VEGC output-archives/after-phen/output-tr.nc
+    $ ./heatmap_year_vs_month.py -s "examples/hm-rect1.png" \
+    -m rect -c 1 -pft 1 -v VEGC output-archives/after-phen/output-tr.nc
 <img width=300px alt="Example polar plot" src="examples/hm-rect1.png" />
 
     $ ./heatmap_year_vs_month.py -s "examples/hm-polar1.png" -m polar -c 1 -pft 1 -v VEGC output-archives/after-phen/output-sp.nc
