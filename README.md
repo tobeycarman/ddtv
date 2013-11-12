@@ -69,10 +69,13 @@ can generate.
       --compare COMPARE [COMPARE ...]
                             path to one or more NetCDF file(s) to compare to (B).
 
+Call: 
 
     $ ./heatmap_year_vs_month.py -s "examples/hm-rect1.png" \
     -m rect -c 1 -pft 1 -v VEGC output-archives/after-phen/output-tr.nc
 <img width=300px alt="Example polar plot" src="examples/hm-rect1.png" />
+
+Call:
 
     $ ./heatmap_year_vs_month.py -s "examples/hm-polar1.png" \
     -m polar -c 1 -pft 1 -v VEGC output-archives/after-phen/output-sp.nc
@@ -141,6 +144,8 @@ can generate.
                             Which variable to plot
       --compare COMPARE     path to a NetCDF file to compare to (B).
 
+Call:
+
     $ ./plot_pft_variable_mly.py --explorer \
     -s "examples/plot_pft_var1.png" --cohort 1 \
     --variable VEGC output-archives/before-phen/output-sp.nc
@@ -165,10 +170,12 @@ can generate.
       -g GRIDID, --gridid GRIDID
                             A grid.nc file that maps cohort ids to lat/lons
 
+Call
+
     $ ./map_cohort_locations.py --display \
     -c ../dvm-dos-tem/DATA/test_06_cohorts/datacht/cohortid.nc \
     -g ../dvm-dos-tem/DATA/test_06_cohorts/datagrid/grid.nc
-<img width=500px alt="An example of the cohort mapping script" src="examles/map_cht1.png" />
+<img width=500px alt="An example of the cohort mapping script" src="examples/map_cht1.png" />
 
 ### map_cohort_locations.py
 
@@ -178,7 +185,7 @@ appropriate variables??
 
     $ ./sankeyA.py
     
-<img width=500px alt="An demo sankey diagram..." src="examles/sankeyA1.png" />
+<img width=500px alt="An demo sankey diagram..." src="examples/sankeyA1.png" />
 
 
 
