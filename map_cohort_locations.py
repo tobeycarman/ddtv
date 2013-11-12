@@ -20,7 +20,8 @@ except ImportError as e:
 
 def main():
   parser = argparse.ArgumentParser(description='''Displays a dot on a map for 
-  each cohort's location.''')
+  each cohort's location. Looks ok for a few cohorts in Alaska, but nothing has
+  been done to automatically format things like choosing the best projection.''')
 
   parser.add_argument('-d', '--display', action='store_true', help="Display the plot")
   parser.add_argument('-s', '--save', default=False, help="Save the plot to simple-plot.png")
@@ -41,9 +42,10 @@ def main():
     lats.append(grid.variables['LAT'][cohort])
 
   
-  x,y = map(lons, lats)
   
   map = Basemap(resolution='c',projection='ortho',lat_0=60.,lon_0=-60.)
+  x,y = map(lons, lats)
+
   map.scatter(x, y)
   map.drawcoastlines() # draw coastlines
   map.drawparallels(np.arange(-90.,120.,30.),labels=[1,0,0,0]) # draw parallels
