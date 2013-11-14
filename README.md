@@ -38,6 +38,61 @@ These are really rough. I have not had time to clean up the plots, or deal with
 labeling the axes, titles, etc., but this should give an idea of what the scripts
 can generate.
 
+### plot_general_diagnostics.py
+
+    $ ./plot_general_diagnostics.py --help
+    usage: plot_general_diagnostics.py [-h] [-ls] [-d] [-s] [-cix N] [-p N]
+                                       [--compare COMPARE]
+                                       inputfile
+
+    Make a generally useful selection of plots...
+
+    positional arguments:
+      inputfile             path to a NetCDF file (A) to read from.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -ls, --list           List the cohorts and PFTs in this file and then exit.
+      -d, --display         Display the plot
+      -s, --save            Save the plot with generic name. Warning: will
+                            overwrite existing file with same name!!
+      -cix N, --cohortindex N
+                            The *index* of the cohort to plot. NOTE: this may or
+                            may not be the same as the COHORTID!
+      -p N, --pft N         Which PFT to plot
+      --compare COMPARE     path to a NetCDF file (B) to compare.
+      
+Example of file list function (obvisously something is tweaked with my output 
+files as it looks like there are 6 cohorts in the file that are all the same!):
+
+    ./plot_general_diagnostics.py -ls output-archives/before-phen/output-sp.nc \
+    --compare output-archives/after-phen/output-tr.nc
+    Loading dataset(s)...
+    Summary
+    -----------------------------------
+    (A): output-archives/before-phen/output-sp.nc
+      Available CHTIDs:  6 6 6 6 6 6
+      # of PFTs (zero indexed):  10
+      length of YYYYMM:  120
+
+    (B): output-archives/after-phen/output-tr.nc
+      Available CHTIDs:  6 6 6 6 6 6
+      # of PFTs (zero indexed):  10
+      length of YYYYMM:  1272
+
+    -----------------------------------
+
+Example of plotting call:
+
+    ./plot_general_diagnostics.py --save \
+                                  --pft 0 \
+                                  --cohortindex 0 \
+                                  output-archives/before-phen/output-sp.nc
+                                  
+<img width=300px alt="Example general diagnostic plot" src="examples/plot_general_diagnostics.png" />
+                                 
+
+
 ### heatmap_year_vs_month.py
 
     ./heatmap_year_vs_month.py --help
@@ -72,13 +127,21 @@ can generate.
 Call: 
 
     $ ./heatmap_year_vs_month.py -s "examples/hm-rect1.png" \
-    -m rect -c 1 -pft 1 -v VEGC output-archives/after-phen/output-tr.nc
+                                 -m rect \
+                                 -c 1 \
+                                 -pft 1 \
+                                 -v VEGC \
+                                 output-archives/after-phen/output-tr.nc
 <img width=300px alt="Example polar plot" src="examples/hm-rect1.png" />
 
 Call:
 
     $ ./heatmap_year_vs_month.py -s "examples/hm-polar1.png" \
-    -m polar -c 1 -pft 1 -v VEGC output-archives/after-phen/output-sp.nc
+                                 -m polar \
+                                 -c 1 \
+                                 -pft 1 \
+                                 -v VEGC \
+                                 output-archives/after-phen/output-sp.nc
 <img width=300px alt="Example polar plot" src="examples/hm-polar1.png" />
 
 ### plot_pft_variable_mly.py
@@ -147,8 +210,11 @@ Call:
 Call:
 
     $ ./plot_pft_variable_mly.py --explorer \
-    -s "examples/plot_pft_var1.png" --cohort 1 \
-    --variable VEGC output-archives/before-phen/output-sp.nc
+                                 -s "examples/plot_pft_var1.png" 
+                                 --cohort 1 \
+                                 --variable VEGC \
+                                 output-archives/before-phen/output-sp.nc
+                                 
 <img width=500px alt="An example pft variable plot" src="examples/plot_pft_var1.png" />
 
 
@@ -173,11 +239,13 @@ Call:
 Call
 
     $ ./map_cohort_locations.py --display \
-    -c ../dvm-dos-tem/DATA/test_06_cohorts/datacht/cohortid.nc \
-    -g ../dvm-dos-tem/DATA/test_06_cohorts/datagrid/grid.nc
+                                -c ../dvm-dos-tem/DATA/test_06_cohorts/datacht/cohortid.nc \
+                                -g ../dvm-dos-tem/DATA/test_06_cohorts/datagrid/grid.nc
 <img width=500px alt="An example of the cohort mapping script" src="examples/map_cht1.png" />
 
-### map_cohort_locations.py
+### Sankey Diagrams !? 
+
+Maybe good for representing fluxes??
 
 This is an experiment...I think this might be useful, but I have not made it
 plot real data yet...Not even sure if the concept is right? Are these
