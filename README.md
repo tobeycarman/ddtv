@@ -66,7 +66,7 @@ Example of file list function (obvisously something is tweaked with my output
 files as it looks like there are 6 cohorts in the file that are all the same!):
 
     ./plot_general_diagnostics.py -ls output-archives/before-phen/output-sp.nc \
-    --compare output-archives/after-phen/output-tr.nc
+                                  --compare output-archives/after-phen/output-tr.nc
     Loading dataset(s)...
     Summary
     -----------------------------------
