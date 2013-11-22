@@ -50,6 +50,7 @@ There are designed to work with ouputs from a single site run. I have not
 tested anything but the yearly timestep and the 'eq' run stage.
  
 First: 
+
     $ ./output-extract.R --help
     Loading required package: proto
     usage: ./output-extract.R [-h] --nc-files-dir PATH
@@ -92,9 +93,11 @@ And then:
                             call this script from).
 
 Examples:
-
+C Plot
 <img width=300px alt="Example general diagnostic plot" src="examples/Ccycle.png" />
+N Plot
 <img width=300px alt="Example general diagnostic plot" src="examples/Ncycle.png" />
+Env Variable Plot
 <img width=300px alt="Example general diagnostic plot" src="examples/EnvVar.png" />
 
 
