@@ -92,13 +92,16 @@ And then:
                             with this name in the current directory (wherever you
                             call this script from).
 
-Examples:
-C Plot
-<img width=300px alt="Example general diagnostic plot" src="examples/Ccycle.png" />
-N Plot
-<img width=300px alt="Example general diagnostic plot" src="examples/Ncycle.png" />
-Env Variable Plot
-<img width=300px alt="Example general diagnostic plot" src="examples/EnvVar.png" />
+Examples:</br>
+
+C Plot</br>
+<img width=300px alt="Example general diagnostic plot" src="examples/Ccycle.png" /></br>
+
+N Plot</br>
+<img width=300px alt="Example general diagnostic plot" src="examples/Ncycle.png" /></br>
+
+Env Variable Plot</br>
+<img width=300px alt="Example general diagnostic plot" src="examples/EnvVar.png" /></br>
 
 
 
