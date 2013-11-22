@@ -93,9 +93,9 @@ And then:
 
 Examples:
 
-<img width=300px alt="Example general diagnostic plot" src="examples/Ccycle.pdf" />
-<img width=300px alt="Example general diagnostic plot" src="examples/Ncycle.pdf" />
-<img width=300px alt="Example general diagnostic plot" src="examples/EnvVar.pdf" />
+<img width=300px alt="Example general diagnostic plot" src="examples/Ccycle.png" />
+<img width=300px alt="Example general diagnostic plot" src="examples/Ncycle.png" />
+<img width=300px alt="Example general diagnostic plot" src="examples/EnvVar.png" />
 
 
 
