@@ -1,0 +1,21 @@
+{
+  "cht": 2,
+  "year": 1900,
+  "month": 0,
+  "gpp": 4.0,
+  "npp": 12.0,
+  "pft0": {
+    "vegcL": 12,
+    "vegcS": 2,
+    "vegcR": 24,
+    "cmax": 24
+  },
+  "pft1": {
+    "vegcL": 12,
+    "vegcS": 2,
+    "vegcR": 24,
+    "cmax": 24
+  }
+}
+   
+    
