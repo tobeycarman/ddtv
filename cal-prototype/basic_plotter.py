@@ -51,16 +51,21 @@ def animate(frame, mod_time, timespan, data_list, line_list):
     
     # read the freshly modified file
     print "open pass thru file..."
-    with open('pass_thru.json') as infile:
+    
+    try:
+      with open('pass_thru.json') as infile:
       
-      d = json.load(infile)
-      #print d['gpp']
+        d = json.load(infile)
+        #print d['gpp']
       
-      # add new data that we just read from the file.
-      # ( not provision for skipped years/months? )
-      gppD.append( float(d['gpp']) )      
-      nppD.append( float(d['npp']) )
-      print "read pass thru file and append new data to data deque..."
+        # add new data that we just read from the file.
+        # ( not provision for skipped years/months? )
+        gppD.append( float(d['gpp']) )      
+        nppD.append( float(d['npp']) )
+        print "read pass thru file and append new data to data deque..."
+    except ValueError as e:
+      print e
+      print "Problem reading pass thru file!!"
     #print np.array(gppD)[0:10], "...", np.array(gppD)[-10:] 
     
     print "set the line's ydata to the new values..."  
@@ -72,9 +77,6 @@ def animate(frame, mod_time, timespan, data_list, line_list):
     #print line_list[0].get_ydata()[-10:]
     return line_list[0], line_list[1]
 
-
-def init():
-  line  
 
 
 def main():
@@ -109,7 +111,7 @@ def main():
   
   mt = os.stat('pass_thru.json').st_mtime
 
-  ani = animation.FuncAnimation(fig, animate, blit=True, interval=100,
+  ani = animation.FuncAnimation(fig, animate, blit=True, interval=250,
       fargs=(mt, timespan, (gpp_deque, npp_deque), (gppL, nppL)))       
   
   

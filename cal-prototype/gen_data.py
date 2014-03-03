@@ -13,8 +13,6 @@ def main():
   for yr in range(0,100):
     for m in range(0,12):
       
-      print "putting data in d..."
-    
       d['pft0']['vegcL'] = random.random()
       d['pft0']['vegcW'] = random.random()
       d['pft0']['vegcR'] = random.random()
@@ -29,10 +27,10 @@ def main():
       d['year'] = yr
       
       #print d
-      print "[DVMDOSTEM] writing d to pass thru file..."
+      print "[DVMDOSTEM] writing d to pass thru file. Year: %s Month: %s" % (yr, m)
       with open('pass_thru.json', 'w') as outfile:
         json.dump(d, outfile)
-      time.sleep(0.25)
+      time.sleep(0.5)
       
 
 if __name__ == '__main__':
