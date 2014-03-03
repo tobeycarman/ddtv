@@ -31,51 +31,61 @@ def animate(frame, mod_time, timespan, data_list, line_list):
 
   if os.stat('pass_thru.json').st_mtime == mod_time:
     print "No change in pass thru file...nothing to do..."
-    return line_list[0], line_list[1]
+    #return line_list[0], line_list[1]
+  
   else:
     print "Pass thru file changed! "
 
     # update the modification time
-    print "update the modification time"
+    print "  update the modification time"
     mod_time = os.stat('pass_thru.json').st_mtime
-    
-    # trim data from full deques  
-    for s in data_list:
-      if len(s) >= timespan:
-        print "Trimming data from a full deque..."
-        s.popleft()
 
-    print "getting the existing data..."
     gppD = data_list[0]
     nppD = data_list[1]
+
     
     # read the freshly modified file
-    print "open pass thru file..."
-    
+    print "  open pass thru file..."
     try:
       with open('pass_thru.json') as infile:
       
         d = json.load(infile)
         #print d['gpp']
-      
-        # add new data that we just read from the file.
-        # ( not provision for skipped years/months? )
-        gppD.append( float(d['gpp']) )      
-        nppD.append( float(d['npp']) )
-        print "read pass thru file and append new data to data deque..."
+        
+        year = d['year']
+        month = d['month']
+        idx = (year * 12) + month
+        
+        print "Got data!:"
+        print "Year: %s, Month: %s, idx: %s" % (year, month, idx)
+
+        if not (idx < len(gppD)):
+          print "  ERROR: data from model is out of range!!"
+          print "  Doing nothing..."
+          #return line_list[0], line_list[1]
+        else:
+          if (year % 5) == 0:
+            print "executing some long process in the plotter and may miss data in pass thru file!!"
+            time.sleep(10)
+            pass
+          else:
+            gppD[idx] = d['gpp']
+            nppD[idx] = d['npp']
+          
+          
     except ValueError as e:
       print e
       print "Problem reading pass thru file!!"
     #print np.array(gppD)[0:10], "...", np.array(gppD)[-10:] 
     
     print "set the line's ydata to the new values..."  
-    line_list[0].set_ydata( np.array(gppD) )
-    line_list[0].set_xdata( np.arange(len(gppD)) )
-    line_list[1].set_ydata( np.array(nppD) )
+    line_list[0].set_ydata(gppD)
+    #line_list[0].set_xdata(gppD)
+    line_list[1].set_ydata( nppD )
     #embed()
     print "returning lines..."
     #print line_list[0].get_ydata()[-10:]
-    return line_list[0], line_list[1]
+  return line_list[0], line_list[1]
 
 
 
@@ -88,31 +98,28 @@ def main():
 
   xrange = np.arange(1, timespan+1)
 
-  gpp_deque = collections.deque(empty_series.copy(), timespan)
-  npp_deque = collections.deque(empty_series.copy(), timespan)
+  gppData = empty_series.copy()
+  nppData = empty_series.copy()
   
   fig, axes = plt.subplots(nrows=2)
 
-#   for ax in axes:
-#     ax.set_ylim(0,1)
+  ax0 = axes[0]
+  ax1 = axes[1]
   
-  #gppL, = axes[0].plot([],[], 'r', label='GPP', lw=2)
-  #nppL, = axes[1].plot([],[], 'b', label='NPP')
-
-  gppL, = axes[0].plot(xrange, np.array(gpp_deque), 'r', label='GPP')
-  nppL, = axes[1].plot(xrange, np.array(npp_deque), 'b', label='NPP')
+  gppL, = ax0.plot(xrange, gppData, 'r', label='GPP')
+  nppL, = ax1.plot(xrange, nppData, 'b', label='NPP')
   
-  axes[0].set_xlim(1,1200)
-  axes[0].set_ylim(0, 1)  
-  axes[1].set_xlim(1,1200)
-  axes[1].set_ylim(0, 1)
+  ax0.set_xlim(1,1200)
+  ax0.set_ylim(0, 1)  
+  ax1.set_xlim(1,1200)
+  ax1.set_ylim(0, 1)
   
-  #embed()
+  embed()
   
   mt = os.stat('pass_thru.json').st_mtime
 
-  ani = animation.FuncAnimation(fig, animate, blit=True, interval=250,
-      fargs=(mt, timespan, (gpp_deque, npp_deque), (gppL, nppL)))       
+  ani = animation.FuncAnimation(fig, animate, blit=True, interval=10,
+      fargs=(mt, timespan, (gppData, nppData), (gppL, nppL)))       
   
   
   plt.show()

@@ -30,7 +30,7 @@ def main():
       print "[DVMDOSTEM] writing d to pass thru file. Year: %s Month: %s" % (yr, m)
       with open('pass_thru.json', 'w') as outfile:
         json.dump(d, outfile)
-      time.sleep(0.5)
+      time.sleep(0.1)
       
 
 if __name__ == '__main__':
