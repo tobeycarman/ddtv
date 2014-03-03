@@ -1,9 +1,9 @@
 {
   "cht": 2,
-  "year": 1900,
-  "month": 0,
-  "gpp": 4.0,
-  "npp": 12.0,
+  "year": 1,
+  "month": 1,
+  "gpp": 12.0,
+  "npp": 4.0,
   "pft0": {
     "vegcL": 12,
     "vegcS": 2,

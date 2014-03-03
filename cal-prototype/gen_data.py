@@ -23,6 +23,8 @@ def main():
       d['pft1']['vegcW'] = random.random()
       d['pft1']['vegcR'] = random.random()
       d['pft1']['cmax'] = random.random()
+      d['gpp'] = random.random()
+      d['npp'] = random.random()
       d['month'] = m
       d['year'] = yr
       
@@ -30,7 +32,7 @@ def main():
       print "[DVMDOSTEM] writing d to pass thru file..."
       with open('pass_thru.json', 'w') as outfile:
         json.dump(d, outfile)
-      time.sleep(1)
+      time.sleep(0.25)
       
 
 if __name__ == '__main__':
