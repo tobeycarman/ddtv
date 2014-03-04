@@ -10,7 +10,8 @@ from random import randrange
 def main():
 
   context = zmq.Context()
-  socket = context.socket(zmq.PUB)
+  socket = context.socket(zmq.PUSH)
+  socket.set_hwm(5)
   socket.bind("tcp://*:5556")
 
   with open('format1.json') as infile:

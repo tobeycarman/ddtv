@@ -69,7 +69,9 @@ def main():
 
   #  Socket to talk to server
   context = zmq.Context()
-  socket = context.socket(zmq.SUB)
+  socket = context.socket(zmq.PULL)
+  socket.set_hwm(5)
+
 
   print("Collecting updates from dmv-dos-tem server...")
   socket.connect("tcp://localhost:5556")
@@ -82,7 +84,7 @@ def main():
   if isinstance(filter, bytes):
       filter = filter.decode('ascii')
   
-  socket.setsockopt_string(zmq.SUBSCRIBE, filter)
+  #socket.setsockopt_string(zmq.SUBSCRIBE, filter)
 
   timespan = 12 * 100
 
