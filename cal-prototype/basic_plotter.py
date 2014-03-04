@@ -19,7 +19,7 @@ import matplotlib.animation as animation
 from IPython import embed
 
 
-def animate(frame, mod_time, timespan, data_list, line_list):
+def animate(frame, mod_time, timespan, sock, data_list, line_list):
   #print frame
   #print mod_time
   #print timespan
@@ -27,57 +27,29 @@ def animate(frame, mod_time, timespan, data_list, line_list):
   #print type(data_list), "-->", type(data_list[0])
   #print type(line_list), "-->", type(line_list[0])
   #print line_list
-
-
-  if os.stat('pass_thru.json').st_mtime == mod_time:
-    print "No change in pass thru file...nothing to do..."
-    #return line_list[0], line_list[1]
   
+  string = sock.recv_string()
+  d = json.loads(string)
+
+  gppD = data_list[0]
+  nppD = data_list[1]
+
+
+  year = d['year']
+  month = d['month']
+  idx = (year * 12) + month
+  
+  print "Got data!:"
+  print "Year: %s, Month: %s, idx: %s" % (year, month, idx)
+
+  if not (idx < len(gppD)):
+    print "  ERROR: data from model is out of range!!"
+    print "  Doing nothing..."
+    #return line_list[0], line_list[1]
   else:
-    print "Pass thru file changed! "
-
-    # update the modification time
-    print "  update the modification time"
-    mod_time = os.stat('pass_thru.json').st_mtime
-
-    gppD = data_list[0]
-    nppD = data_list[1]
-
-    
-    # read the freshly modified file
-    print "  open pass thru file..."
-    try:
-      with open('pass_thru.json') as infile:
-      
-        d = json.load(infile)
-        #print d['gpp']
+    gppD[idx] = d['gpp']
+    nppD[idx] = d['npp']
         
-        year = d['year']
-        month = d['month']
-        idx = (year * 12) + month
-        
-        print "Got data!:"
-        print "Year: %s, Month: %s, idx: %s" % (year, month, idx)
-
-        if not (idx < len(gppD)):
-          print "  ERROR: data from model is out of range!!"
-          print "  Doing nothing..."
-          #return line_list[0], line_list[1]
-        else:
-          if (year % 5) == 0:
-            print "executing some long process in the plotter and may miss data in pass thru file!!"
-            time.sleep(10)
-            pass
-          else:
-            gppD[idx] = d['gpp']
-            nppD[idx] = d['npp']
-          
-          
-    except ValueError as e:
-      print e
-      print "Problem reading pass thru file!!"
-    #print np.array(gppD)[0:10], "...", np.array(gppD)[-10:] 
-    
     print "set the line's ydata to the new values..."  
     line_list[0].set_ydata(gppD)
     #line_list[0].set_xdata(gppD)
@@ -90,6 +62,27 @@ def animate(frame, mod_time, timespan, data_list, line_list):
 
 
 def main():
+
+
+  import sys
+  import zmq
+
+  #  Socket to talk to server
+  context = zmq.Context()
+  socket = context.socket(zmq.SUB)
+
+  print("Collecting updates from dmv-dos-tem server...")
+  socket.connect("tcp://localhost:5556")
+
+  # Subscribe to zipcode, default is NYC, 10001
+  #zip_filter = sys.argv[1] if len(sys.argv) > 1 else "10001"
+
+  # Python 2 - ascii bytes to unicode str
+  filter = ''
+  if isinstance(filter, bytes):
+      filter = filter.decode('ascii')
+  
+  socket.setsockopt_string(zmq.SUBSCRIBE, filter)
 
   timespan = 12 * 100
 
@@ -114,12 +107,12 @@ def main():
   ax1.set_xlim(1,1200)
   ax1.set_ylim(0, 1)
   
-  embed()
+  #embed()
   
   mt = os.stat('pass_thru.json').st_mtime
 
   ani = animation.FuncAnimation(fig, animate, blit=True, interval=10,
-      fargs=(mt, timespan, (gppData, nppData), (gppL, nppL)))       
+      fargs=(mt, timespan, socket, (gppData, nppData), (gppL, nppL)))       
   
   
   plt.show()
