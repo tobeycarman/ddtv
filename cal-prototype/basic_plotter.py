@@ -14,19 +14,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-#import pandas as pd
-
 from IPython import embed
 
 
-def animate(frame, mod_time, timespan, sock, data_list, line_list):
-  #print frame
-  #print mod_time
-  #print timespan
-  #print series_list
-  #print type(data_list), "-->", type(data_list[0])
-  #print type(line_list), "-->", type(line_list[0])
-  #print line_list
+def update(frame, mod_time, timespan, sock, data_list, line_list):
   
   string = sock.recv_string()
   d = json.loads(string)
@@ -72,12 +63,8 @@ def main():
   socket = context.socket(zmq.PULL)
   socket.set_hwm(5)
 
-
   print("Collecting updates from dmv-dos-tem server...")
   socket.connect("tcp://localhost:5556")
-
-  # Subscribe to zipcode, default is NYC, 10001
-  #zip_filter = sys.argv[1] if len(sys.argv) > 1 else "10001"
 
   # Python 2 - ascii bytes to unicode str
   filter = ''
@@ -113,7 +100,7 @@ def main():
   
   mt = os.stat('pass_thru.json').st_mtime
 
-  ani = animation.FuncAnimation(fig, animate, blit=True, interval=10,
+  ani = animation.FuncAnimation(fig, update, blit=True, interval=10,
       fargs=(mt, timespan, socket, (gppData, nppData), (gppL, nppL)))       
   
   

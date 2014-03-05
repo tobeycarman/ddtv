@@ -43,7 +43,7 @@ def main():
       socket.send_string(json.dumps(d))
 
       print "[DVMDOSTEM] sleeping..."
-      time.sleep(0.1)
+      #time.sleep(0.1)
       
 
 if __name__ == '__main__':
