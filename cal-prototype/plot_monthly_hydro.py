@@ -32,8 +32,6 @@ class MonthlyHydroFigure(object):
     empty_series = np.empty(self._timerange)
     empty_series.fill(np.nan)
   
-    t = np.arange(1, self._timerange + 1) # plot against a one based index
-
     self._traces = [
       {
         'jsontag': 'Precipitation',
@@ -63,13 +61,31 @@ class MonthlyHydroFigure(object):
       },
     ]
     
+    t = np.arange(1, self._timerange + 1) # plot against a one based index
     for ax in self._axes:
       ax.set_xlim(t[0], t[-1])
       ax.set_ylim(-1,200)
       l = ax.legend()
       #l.set_zorder(1000)
 
+
+  def rescale(self, percent=0.25):
+    self._timerange += percent * self._timerange
+    new_container = np.empty(self._timerange)
+    new_container.fill(np.nan)
     
+    for trace in self._traces:
+      new_container[0:len(trace['data']) ] = trace['data']
+      trace['data'] = new_container
+
+    t = np.arange(1, self._timerange + 1) # plot against a one based index
+    for ax in self._axes:
+      ax.set_xlim(t[0], t[-1])
+      ax.set_ylim(-1,200)
+      l = ax.legend()
+
+
+
     
   def figure(self):
     '''Returns a figure instance'''
@@ -108,7 +124,9 @@ class MonthlyHydroFigure(object):
     
   def update(self, frame):
     print "frame[%i]" % frame, 
-    
+    if frame%20 == 0:
+      self.rescale()
+
     t = np.arange(1, self._timerange + 1)
     
     
