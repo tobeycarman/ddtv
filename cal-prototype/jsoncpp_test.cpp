@@ -12,7 +12,32 @@
 #include <sstream>
 
 
-int main(){
+int main(int argc, char *argv[]) {
+
+    int YRS = 100;
+    int DELAY = 1000; // micro secs? 1,000,000 per second
+
+    if (argc >= 3) {
+      if ( ((argc-1) % 2) != 0 ) {
+        std::cerr << "Wrong number of arguments!\n";
+        exit(-1);
+      }
+      for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "-y") == 0) {
+          std::stringstream v( argv[i+1] );
+          if ( !(v >> YRS) ) {
+            std::cerr << "Error converting arg...\n";
+          }
+        }
+
+        if (strcmp(argv[i], "-d") == 0) {
+          std::stringstream v( argv[i+1] );
+          if ( !(v >> DELAY) ) {
+            std::cerr << "Error converting arg...\n";
+          }
+        }
+      }
+    }
 
     Json::Value data;
 
@@ -20,7 +45,7 @@ int main(){
 
     std::ofstream out_stream;
 
-    for(int year=0; year<100; year++){
+    for(int year=0; year<YRS; year++){
     for(int month=0; month<12; month++){
 
         data["Year"] = year;
@@ -54,7 +79,7 @@ int main(){
 
         out_stream.close();
 
-        usleep(5000);
+        usleep(DELAY);
     }
     }
 
