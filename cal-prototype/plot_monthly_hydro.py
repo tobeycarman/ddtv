@@ -70,7 +70,8 @@ class MonthlyHydroFigure(object):
 
 
   def rescale(self, percent=0.25):
-    self._timerange += percent * self._timerange
+    i = int(percent * self._timerange)
+    self._timerange += i
     new_container = np.empty(self._timerange)
     new_container.fill(np.nan)
     
@@ -109,6 +110,11 @@ class MonthlyHydroFigure(object):
       base = os.path.basename(file)              # YYYY_MM.json
       idx = YYYY_MM2idx( os.path.splitext(base)[0] )  # 0 based month number
 
+      if idx > self._timerange:
+        print "idx(%i) > self._timerange(%i)! Rescaling..." % (idx, self._timerange)
+        self.rescale()
+        print "new timerange: %s" % self._timerange
+
       if idx < self._timerange:
 
        for trace in self._traces:
@@ -124,14 +130,10 @@ class MonthlyHydroFigure(object):
     
   def update(self, frame):
     print "frame[%i]" % frame, 
-    if frame%20 == 0:
-      self.rescale()
 
-    t = np.arange(1, self._timerange + 1)
-    
-    
     if self.load_data():
       print "loaded new data..."
+      t = np.arange(1, self._timerange + 1)
       for trace in self._traces:
         a = trace['artist'][0]  # <-- not sure why this is a list?
         a.set_data( t, trace['data'] )
@@ -166,3 +168,6 @@ def main():
 
 if __name__ == '__main__':
   main()
+
+
+
