@@ -46,7 +46,7 @@ int main(){
 
         std::stringstream filename;
         filename.fill('0');
-        filename << std::setw(4) << year << "_" << std::setw(2) << month << ".json";
+        filename << "tmp-json/" << std::setw(4) << year << "_" << std::setw(2) << month << ".json";
 
         out_stream.open(filename.str().c_str(), std::ofstream::out);
 

@@ -20,7 +20,7 @@ def ym2idx(s):
 
 
 def myfunc(frame, plotitems):
-  for file in glob.glob('../../testing/*.json'):
+  for file in glob.glob('tmp-json/*.json'):
     base = os.path.basename(file)              # YYYY_MM.json
     idx = ym2idx( os.path.splitext(base)[0] )  # 0 based month number
     #print file, idx
