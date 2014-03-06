@@ -1,28 +1,29 @@
-Installing matplotlib on Fedora for working with dvm-dos-tem visualization tools. 
+matplotlib on Fedora for ddtv
+====================================
 
-Plan is to use a virtual environment and pip to manage all the various python libraries. But there is some stuff that must be compiled outside of python and we will use yum to manage those things.
+The plan is to use a virtual environment and `pip` to manage all the various python libraries. But there is some stuff that must be compiled outside of python and we will use `yum` (specifically `yum-builddep`) to manage those things.
 
-Move to your home then install virtualenv.
+Use yum to install `virtualenv`.
 
-    $ cd ~
     $ yum search virtualenv
     $ sudo yum install python-virtualenv
-
-
-Now, create a new virtualenv called "science".
-
-    $ mkdir venvs
-    $ cd venvs/
-    $ virtualenv science 
 
 Now use yum to build all the dependencies for matplotlib
 
     $ sudo yum-builddep python-matplotlib
 
+Move to home and create a new virtual environment called "science". You can call it whatever you want. At a later date, we may find it useful to keep the virtualenv with a specific project. But for starters, it should be fine to make one in your home directory. You could reuse this environment for other projects.
+
+    $ cd ~
+    $ mkdir venvs
+    $ cd venvs/
+    $ virtualenv science 
+
 Now "turn on" your python environment. Note the change to the beginning of your prompt. Type "deactivate" to get out of the virtual environment.
 
     $ cd ~
     $ source ~/venvs/science/bin/activate
+    (science) $
 
  Now with your new environment activated, install the plotting stuff.
  
