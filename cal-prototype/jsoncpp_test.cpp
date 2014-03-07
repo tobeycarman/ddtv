@@ -6,11 +6,12 @@
 //#include <random> //Unnecessary in real version
 #include <fstream>
 #include <unistd.h> //For Sleep(). Unnecessary in real version.
+#include <cmath>//for sin(). Unnecessary...
 
 //for output filename stuff
 #include <iomanip>
 #include <sstream>
-
+#include <cstring> //for strcmp()
 
 int main(int argc, char *argv[]) {
 
@@ -52,15 +53,15 @@ int main(int argc, char *argv[]) {
         data["Month"] = month;
    
         //Monthly Thermal information 
-        data["TempAir"] = rand()%100*1.0;
-        data["TempOrganicLayer"] = rand()%100*1.0;
+        data["TempAir"] = sin((month/2.))*100;
+        data["TempOrganicLayer"] = 75.0;
         data["TempMineralLayer"] = rand()%100*1.0;
         data["PAR"] = rand()%100*1.0;
         data["ActiveLayerDepth"] = rand()%100*1.0;
 
         //Monthly Hydrodynamic information
         data["Precipitation"] = rand()%100*1.0;
-        data["WaterTable"] = rand()%100*1.0;
+        data["WaterTable"] = sin((month/2.))*100;
         data["VWCOrganicLayer"] = rand()%100*1.0;
         data["VWCMineralLayer"] = rand()%100*1.0;
         data["Evapotranspiration"] = rand()%100*1.0;
@@ -71,7 +72,8 @@ int main(int argc, char *argv[]) {
 
         std::stringstream filename;
         filename.fill('0');
-        filename << "tmp-json/" << std::setw(4) << year << "_" << std::setw(2) << month << ".json";
+        //filename << "tmp-json/" << std::setw(4) << year << "_" << std::setw(2) << month << ".json";
+        filename << "/tmp/cal-dvmdostem/" << std::setw(4) << year << "_" << std::setw(2) << month << ".json";
 
         out_stream.open(filename.str().c_str(), std::ofstream::out);
 
