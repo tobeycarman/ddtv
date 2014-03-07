@@ -15,6 +15,12 @@ import matplotlib.animation as animation
 from IPython import embed
 
 def YYYY_MM2idx(s):
+  '''Convert from year/month to index, assuming year and month start at 0
+     
+     0000_00 --> index 0 (jan, year 0)
+     0001_00 --> index 12 (jan of year 1)
+     etc...
+  '''
   year = int(s[0:4])
   month = int(s[5:])
   return (year * 12) + month
@@ -106,7 +112,7 @@ class MonthlyHydroFigure(object):
     containers.'''
     did_load_more_data = False    
 
-    for file in glob.glob('tmp-json/*.json'):
+    for file in glob.glob('/tmp/cal-dvmdostem/*.json'):
       base = os.path.basename(file)              # YYYY_MM.json
       idx = YYYY_MM2idx( os.path.splitext(base)[0] )  # 0 based month number
 
