@@ -30,7 +30,7 @@ class MonthlyHydroFigure(object):
   
   def __init__(self, timerange=100):
     self._fig, self._axes = plt.subplots(4,1,sharex='all')
-    self._fig.suptitle('Monthly Thermal')
+    self._fig.suptitle('Monthly Hydro')
 
     self._timerange = timerange
 
