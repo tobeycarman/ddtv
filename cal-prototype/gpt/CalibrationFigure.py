@@ -119,15 +119,38 @@ class CalibrationFigure(object):
     self.set_all_axis_limits_and_tickers()
 
   def set_xaxis_ticks(self):
-    loc = mplticker.MultipleLocator(base=12)
-    if (self._timerange > 600) and (self._timerange <= 2400):
-      loc = mplticker.MultipleLocator(base=120)
-    elif self._timerange > 2400:
-      loc = mplticker.MultipleLocator(base=1200)
+    tic_locs = {
+      '1yr':      1 * 12,
+      '5yr':      5 * 12,
+      '10yr':    10 * 12,
+      '20yr':    20 * 12,
+      '30yr':    30 * 12,
+      '40yr':    40 * 12,
+      '50yr':    50 * 12,
+      '75yr':    75 * 12,
+      '100yr':  100 * 12,
+      '200yr':  200 * 12,
+      '300yr':  300 * 12,
+      '400yr':  400 * 12,
+      
+    }
 
+    # ideally ~7 ticks on the x axis
+    ideal_yrs_per_tick = self._timerange / 7.0
+    
+    key, locater_base = min(
+        tic_locs.iteritems(), key=lambda (_, v): abs(v - ideal_yrs_per_tick)
+    )
+    print "  ideal years per tick: ", ideal_yrs_per_tick
+    print "  selected yrs per tick: ", key, "(months between ticks:", locater_base, ")"
+
+    loc = mplticker.MultipleLocator(base=locater_base)
+    
     for ax in self._axes:
       ax.set_xlim(1, self._timerange + 1)
       ax.xaxis.set_major_locator(loc)
+      ax.grid()
+
 
   def set_yaxis_lims(self):
     for ax in self._axes:
