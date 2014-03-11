@@ -8,7 +8,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mplticker
 
-#from IPython import embed
+from IPython import embed
+
+import pdb
 
 def YYYY_MM2idx(s):
   '''Convert 'YYYY_MM' string to index, assuming year and month start at 0
@@ -78,12 +80,11 @@ class CalibrationFigure(object):
         print "new timerange: %s" % self._timerange
 
       if idx < self._timerange:
-
-       for trace in self._traces:
+        for trace in self._traces:
           if ( np.isnan(trace['data'][idx]) ):
             with open(file) as f:
               new_data = json.load(f)
-          
+
             trace['data'][idx] = new_data[ trace['jsontag'] ]
             did_load_more_data = True
       else:
@@ -92,16 +93,15 @@ class CalibrationFigure(object):
     
   def update(self, frame):
     print "frame[%i]" % frame, 
-
     if self.load_data():
       print "loaded new data..."
       t = np.arange(1, self._timerange + 1)
       for trace in self._traces:
         a = trace['artist'][0]  # <-- not sure why this is a list?
         a.set_data( t, trace['data'] )
-
     else:
       print "no new data loaded..."
+
     artist_list = [ trace['artist'] for trace in self._traces ]
     return artist_list
       
@@ -115,15 +115,29 @@ class CalibrationFigure(object):
       new_trace = new_container.copy()
       new_trace[0:len(trace['data']) ] = trace['data']
       trace['data'] = new_trace
-  def set_all_axis_limits_and_tickers(self):
 
-    loc = mplticker.MultipleLocator(base=120)
-    t = np.arange(1, self._timerange + 1) 
+    self.set_all_axis_limits_and_tickers()
+
+  def set_xaxis_ticks(self):
+    loc = mplticker.MultipleLocator(base=12)
+    if (self._timerange > 600) and (self._timerange <= 2400):
+      loc = mplticker.MultipleLocator(base=120)
+    elif self._timerange > 2400:
+      loc = mplticker.MultipleLocator(base=1200)
 
     for ax in self._axes:
-      ax.set_xlim(t[0], t[-1])
-      ax.set_ylim(-1,200)
+      ax.set_xlim(1, self._timerange + 1)
       ax.xaxis.set_major_locator(loc)
+
+  def set_yaxis_lims(self):
+    for ax in self._axes:
+      ax.set_ylim(-1,200.0)
+
+
+  def set_all_axis_limits_and_tickers(self):
+    self.set_xaxis_ticks()
+    self.set_yaxis_lims()
+    for ax in self._axes:
       l = ax.legend()
       
       
