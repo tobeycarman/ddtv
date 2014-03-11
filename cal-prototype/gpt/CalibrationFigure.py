@@ -112,11 +112,9 @@ class CalibrationFigure(object):
     new_container.fill(np.nan)
     
     for trace in self._traces:
-      new_container[0:len(trace['data']) ] = trace['data']
-      trace['data'] = new_container
-
-    self.set_all_axis_limits_and_tickers()
-
+      new_trace = new_container.copy()
+      new_trace[0:len(trace['data']) ] = trace['data']
+      trace['data'] = new_trace
   def set_all_axis_limits_and_tickers(self):
 
     loc = mplticker.MultipleLocator(base=120)
