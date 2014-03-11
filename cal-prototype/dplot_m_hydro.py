@@ -30,22 +30,27 @@ class MonthlyHydroFigure(CalibrationFigure):
         'data': empty_series.copy(),
         'artist': self._axes[0].plot( [],[], label="Precip" )
       },
+
+
       {
         'jsontag': 'WaterTable',
         'data': empty_series.copy(),
         'artist': self._axes[1].plot( [],[], label="Water Table" )
       },
+
+
       {
         'jsontag': 'VWCOrganicLayer',
         'data': empty_series.copy(),
         'artist': self._axes[2].plot( [],[], label="vwc organic layer" )
-
       },
       {
         'jsontag': 'VWCMineralLayer',
         'data': empty_series.copy(),
         'artist': self._axes[2].plot( [],[], label="vwc mineral layer" )
       },
+
+
       {
         'jsontag': 'Evapotranspiration',
         'data': empty_series.copy(),
@@ -64,7 +69,7 @@ class MonthlyHydroFigure(CalibrationFigure):
 
 def main():
 
-  mhf = MonthlyHydroFigure( timerange = 10 )  # <- MONTHS!
+  mhf = MonthlyHydroFigure( timerange = 6 * 12 )  # <- MONTHS!
 
   
   ani = animation.FuncAnimation( mhf.figure(), 

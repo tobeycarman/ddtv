@@ -38,6 +38,7 @@ class MonthlyThermalFigure(CalibrationFigure):
        'artist': self._axes[0].plot( [],[], label="org. layer temp" )
       },
 
+
       {
        'jsontag': 'TempMineralLayer',
        'data': empty_series.copy(),
@@ -48,6 +49,8 @@ class MonthlyThermalFigure(CalibrationFigure):
        'data': empty_series.copy(),
        'artist': self._axes[1].plot( [],[], label="PAR" )
       },
+
+
       {
        'jsontag': 'ActiveLayerDepth',
        'data': empty_series.copy(),
@@ -61,7 +64,7 @@ class MonthlyThermalFigure(CalibrationFigure):
     
 def main():
 
-  mtf = MonthlyThermalFigure( timerange = 10 )  # <- MONTHS!
+  mtf = MonthlyThermalFigure( timerange = 6 * 12 )  # <- MONTHS!
 
   
   ani = animation.FuncAnimation( mtf.figure(), 
