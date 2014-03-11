@@ -1,6 +1,7 @@
 .DS_Store
 .RData
 .Rhistory
+*.pyc
 *.swp
 plots/*
 output-archives/*
