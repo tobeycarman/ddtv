@@ -115,9 +115,9 @@ class CalibrationFigure(object):
       new_container[0:len(trace['data']) ] = trace['data']
       trace['data'] = new_container
 
-    self.GGGG()
+    self.set_all_axis_limits_and_tickers()
 
-  def GGGG(self):
+  def set_all_axis_limits_and_tickers(self):
 
     loc = mplticker.MultipleLocator(base=120)
     t = np.arange(1, self._timerange + 1) 

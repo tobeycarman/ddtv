@@ -53,7 +53,7 @@ class MonthlyHydroFigure(CalibrationFigure):
       },
     ]
     
-    self.GGGG()
+    self.set_all_axis_limits_and_tickers()
 
 
 
@@ -64,7 +64,7 @@ class MonthlyHydroFigure(CalibrationFigure):
 
 def main():
 
-  mhf = MonthlyHydroFigure( timerange=T )  # <- MONTHS!
+  mhf = MonthlyHydroFigure( timerange = 10 )  # <- MONTHS!
 
   
   ani = animation.FuncAnimation( mhf.figure(), 

@@ -56,7 +56,7 @@ class MonthlyThermalFigure(CalibrationFigure):
     ]
   
   
-    self.GGGG()
+    self.set_all_axis_limits_and_tickers()
     
     
 def main():
