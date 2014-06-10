@@ -86,7 +86,7 @@ def main(fileA, compareFile):
 
     flatdata = list(itertools.chain.from_iterable( dsA.variables[vars[0]] ))
     for j, v in enumerate(vars):
-      print "  {0:}".format(v)
+      print "  {0:} {1:}".format(v, dsA.variables[v].shape)
       if not j == 0:
         flatdata = np.vstack( (flatdata, list(itertools.chain.from_iterable( dsA.variables[vars[j]]))) )
       else:
@@ -102,46 +102,42 @@ def main(fileA, compareFile):
     ax.set_yticks( range(0, len(vars)) )
     ax.set_yticklabels(())
 
+    print "shape of image being plotted:", flatdata.shape
     plt.imshow(flatdata, interpolation='none', aspect=1.0) # 4 -> height is 4x the width
 
   plt.show()
 
 
 
-  gs = gridspec.GridSpec( len(dim_grpA_3D), 1 )
+  gs = gridspec.GridSpec( 1, len(dim_grpA_3D) )
   fig = plt.figure()
   fig.suptitle("3D variables for %s" % args.file)
   print "Finding all variables that are in terms of each 3D dimension group..."
 
-  print "UNFINISHED!"
   #from IPython import embed; embed()
   for i, dim_grp in enumerate(dim_grpA_3D):
     print "Axes {0:}  {1:}".format(i, dim_grp)
     vars = [var for var in dsA.variables if dsA.variables[var].dimensions == dim_grp]
 
     ax = plt.subplot(gs[i])
-    #flatdata = list(itertools.chain.from_iterable( dsA.variables[vars[0]] ))
+    s = dsA.variables[vars[0]].shape
+    flatdata = np.vstack( (dsA.variables[vars[0]][:].reshape((s[0]*s[1], s[2]))) )
     for j, v in enumerate(vars):
-      #from IPython import embed; embed()
-
-      print "  {0:}".format(v)
+      print "  {0:} {1:}".format(v, dsA.variables[v].shape)
 
       s = dsA.variables[v].shape
+      flatdata = np.vstack( (flatdata, dsA.variables[v][:].reshape((s[0]*s[1], s[2]))) )
 
-      #ax.set_xlabel("%s, %s" % (dim_grp[0], dim_grp[1]))
-      ax.set_xticks(())
-      ax.set_xticklabels(())
+    #ax.set_xlabel("%s, %s" % (dim_grp[0], dim_grp[1]))
+    ax.set_xticks(())
+    ax.set_xticklabels(())
 
-      #ax.set_ylabel("%i" % i)
-      #ax.set_yticks( range(0, len(vars)) )
-      ax.set_yticklabels(())
+    #ax.set_ylabel("%i" % i)
+    #ax.set_yticks( range(0, len(vars)) )
+    ax.set_yticklabels(())
 
-
-
-      # BROKEN. Need to vstack the different variables!
-      plt.imshow(dsA.variables[v][:].reshape((s[0]*s[1], s[2])), aspect=1.0, interpolation='none')
-
-
+    print "shape of image being plotted:", flatdata.shape
+    plt.imshow(dsA.variables[v][:].reshape((s[0]*s[1], s[2])), aspect=1.0, interpolation='none')
 
   plt.show()
 
