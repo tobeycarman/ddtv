@@ -23,7 +23,7 @@ import collections
 
 
 # turns out there is no need to use this - just get a numpy array straight
-# from a netcdf variable slice and then reshape as needed.
+# from a netcdf variable, slice, and then reshape as needed.
 def flat_gen(x):
   '''Generator to flatten arbitrarily deep nested list...'''
 
