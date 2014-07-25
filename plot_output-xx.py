@@ -2,12 +2,20 @@
 
 import sys # for exit()
 import argparse
+import textwrap
+
 import netCDF4 as nc
 import numpy as np
 import matplotlib.pyplot as plt
 
 def main():
-  parser = argparse.ArgumentParser(description='''Make a generally useful selection of plots...''')
+
+  parser = argparse.ArgumentParser(description=textwrap.dedent('''\
+      Make various plots from dvmdostem's "output-**.nc" files. "output-**.nc" 
+      files can hold data from multiple cohorts, for multiple years. They
+      should have the following dimensions: 
+      CHTID (UNLIMITED), YEAR, YYYYMM, PFTS
+      '''))
 
   #group = parser.add_mutually_exclusive_group()
   #group.add_argument('-n', '--normal', action="store_true")
@@ -26,8 +34,8 @@ def main():
   parser.add_argument('-p', '--pft', default=0, required=False, type=int, metavar='N',
       help='Which PFT to plot')
 
-  parser.add_argument('inputfile', help='path to a NetCDF file (A) to read from.')
-  parser.add_argument('--compare', default=None, help='path to a NetCDF file (B) to compare.')
+  parser.add_argument('inputfile', help="path to a output-xx.nc file (A) to read from.")
+  parser.add_argument('--compare', default=None, help="path to an output-xx.nc file (B) to compare.")
 
   args = parser.parse_args()
   
