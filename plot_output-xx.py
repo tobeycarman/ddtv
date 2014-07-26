@@ -57,9 +57,6 @@ def main():
   print '(A): ', args.inputfile
   print '(B): ', args.compare 
    
-  if args.compare:
-    print "WARNING: '--compare' flag not implemented yet! Won't do anything!!"
-
   #  
   # General plot settings...
   #
@@ -145,6 +142,13 @@ def main():
   #nuptake_cht = ??? #<- not sure what variable this is...not in variable list?
   Nax.plot(np.arange(0, len(avln_cht)), avln_cht, label='avln')
   Nax.legend(loc='best', fancybox=True)
+  if args.compare:
+    avlnB = dsB.variables['AVLN']
+    avln_chtB = avlnB[chtidx, :]
+    #nuptake_cht = ??? #<- not sure what variable this is...not in variable list?
+    NaxB.plot(np.arange(0, len(avln_chtB)), avln_chtB, label='avln')
+    NaxB.legend(loc='best', fancybox=True)
+
   
   # Soil C subplot (I have no idea if these are the right variabels...??)
   oshlwc = dsA.variables['OSHLWC']
@@ -160,6 +164,20 @@ def main():
   SOILCax.plot(np.arange(0, len(odeepc_cht)), odeepc_cht, label='odeepc')
   SOILCax.plot(np.arange(0, len(mineac_cht)), mineac_cht, label='mineac')
   SOILCax.legend(loc='best', fancybox=True)
+  if args.compare:
+    oshlwcB = dsB.variables['OSHLWC']
+    oshlwc_chtB = oshlwcB[chtidx, :]
+
+    odeepcB = dsB.variables['ODEEPC']
+    odeepc_chtB = odeepcB[chtidx, :]
+
+    mineacB = dsB.variables['MINEAC']
+    mineac_chtB = oshlwcB[chtidx, :]
+
+    SOILCaxB.plot(np.arange(0, len(oshlwc_chtB)), oshlwc_chtB, label='oshlwc')
+    SOILCaxB.plot(np.arange(0, len(odeepc_chtB)), odeepc_chtB, label='odeepc')
+    SOILCaxB.plot(np.arange(0, len(mineac_chtB)), mineac_chtB, label='mineac')
+    SOILCaxB.legend(loc='best', fancybox=True)
 
   
 
@@ -177,6 +195,22 @@ def main():
   SOILax.plot(np.arange(0, len(eet_cht)), eet_cht, label='eet')
   SOILax.plot(np.arange(0, len(tshlw_cht)), tshlw_cht, label='tshlw')
   SOILax.legend(loc='best')
+
+  if args.compare:
+    aldB = dsB.variables['ALD']
+    ald_chtB = aldB[chtidx, :]
+
+    eetB = dsB.variables['EET']
+    eet_chtB = aldB[chtidx, :]
+
+    tshlwB = dsB.variables['TSHLW']
+    tshlw_chtB = tshlwB[chtidx, :]
+
+    SOILaxB.plot(np.arange(0, len(ald_chtB)), ald_chtB, label='ald')
+    SOILaxB.plot(np.arange(0, len(eet_chtB)), eet_chtB, label='eet')
+    SOILaxB.plot(np.arange(0, len(tshlw_chtB)), tshlw_chtB, label='tshlw')
+    SOILaxB.legend(loc='best')
+
 
 
   # VWC subplot...
@@ -201,10 +235,29 @@ def main():
   VWCax.plot(np.arange(0, len(vwcmineb_cht)), vwcmineb_cht, label='vwcminb')
   VWCax.plot(np.arange(0, len(vwcminec_cht)), vwcminec_cht, label='vwcminc')
   VWCax.legend(loc='best')
-  
-#   from IPython import embed
-#   embed()
-  
+  if args.compare:
+    vwcshlwB = dsB.variables['VWCSHLW']
+    vwcshlw_chtB = vwcshlwB[chtidx, :]
+
+    vwcdeepB = dsB.variables['VWCDEEP']
+    vwcdeep_chtB = vwcdeepB[chtidx, :]
+
+    vwcmineaB = dsB.variables['VWCMINEA']
+    vwcminea_chtB = vwcmineaB[chtidx, :]
+
+    vwcminebB = dsB.variables['VWCMINEB']
+    vwcmineb_chtB = vwcminebB[chtidx, :]
+
+    vwcminecB = dsB.variables['VWCMINEC']
+    vwcminec_chtB = vwcminecB[chtidx, :]
+
+    VWCaxB.plot(np.arange(0, len(vwcshlw_chtB)), vwcshlw_chtB, label='vwcshlw')
+    VWCaxB.plot(np.arange(0, len(vwcdeep_chtB)), vwcdeep_chtB, label='vwcdeep')
+    VWCaxB.plot(np.arange(0, len(vwcminea_chtB)), vwcminea_chtB, label='vwcmina')
+    VWCaxB.plot(np.arange(0, len(vwcmineb_chtB)), vwcmineb_chtB, label='vwcminb')
+    VWCaxB.plot(np.arange(0, len(vwcminec_chtB)), vwcminec_chtB, label='vwcminc')
+    VWCaxB.legend(loc='best')
+
   if args.save:
     saved_file_name = "plot_general_diagnostics.png"
     print "Savging plot as '%s'..." % saved_file_name
