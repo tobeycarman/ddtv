@@ -65,7 +65,21 @@ def main():
   #
   plt.rcParams['figure.figsize'] = 7.5, 10 # w, h
   # get a figure instance and an axes instance for each subplot
-  fig, (Cax, LAIax, Nax, SOILCax, SOILax, VWCax) = plt.subplots(nrows=6, ncols=1)
+  if args.compare:
+    plt.rcParams['figure.figsize'] = 14, 10 # w, h
+    # get a figure instance and an axes instance for each subplot
+    fig, (CaxL, LAIaxL, NaxL, SOILCaxL, SOILaxL, VWCaxL, ) = plt.subplots(nrows=6, ncols=2)
+    (Cax, CaxB) = CaxL[:]
+    (LAIax, LAIaxB) = LAIaxL[:]
+    (Nax, NaxB) = NaxL[:]
+    (SOILCax, SOILCaxB) = SOILCaxL[:]
+    (SOILax, SOILaxB) = SOILaxL[:]
+    (VWCax, VWCaxB) = VWCaxL[:]
+
+  else:
+    fig, (Cax, LAIax, Nax, SOILCax, SOILax, VWCax, ) = plt.subplots(nrows=6, ncols=1)
+
+
   fig.subplots_adjust(hspace=.5)
 
   # build the title...
@@ -93,14 +107,37 @@ def main():
   npp_cht_pft = npp[chtidx, :, pftidx]
 
   Cax.plot(np.arange(0,len(vegc_cht_pft)), vegc_cht_pft, color='k', label='vegc')
-  Cax.plot(np.arange(0,len(npp_cht_pft)), npp_cht_pft, color='r', label='npp')
-  Cax.legend(loc='best', fancybox=True)
+  Cax.legend(loc='upper left', fancybox=True)
+
+  Cax1 = Cax.twinx()
+  Cax1.plot(np.arange(0,len(npp_cht_pft)), npp_cht_pft, color='r', label='npp')
+  Cax1.legend(loc='upper right', fancybox=True)
+
+  if args.compare:
+    vegcB = dsB.variables['VEGC']
+    nppB = dsB.variables['NPP']
+
+    vegc_cht_pftB = vegcB[chtidx, :, pftidx]
+    npp_cht_pftB = nppB[chtidx, :, pftidx]
+
+    CaxB.plot(np.arange(0,len(vegc_cht_pftB)), vegc_cht_pftB, color='k', label='vegc')
+    CaxB.legend(loc='upper left', fancybox=True)
+
+    CaxB1 = CaxB.twinx()
+    CaxB1.plot(np.arange(0,len(npp_cht_pftB)), npp_cht_pftB, color='r', label='npp')
+    CaxB1.legend(loc='upper right', fancybox=True)
+
 
   # Lai subplot...
   lai = dsA.variables['LAI']
   lai_cht_pft = lai[chtidx, :, pftidx]
   LAIax.plot(np.arange(0, len(lai_cht_pft)), lai_cht_pft, label='lai')
   LAIax.legend(loc='best', fancybox=True)
+  if args.compare:
+    laiB = dsB.variables['LAI']
+    lai_cht_pftB = laiB[chtidx, :, pftidx]
+    LAIaxB.plot(np.arange(0, len(lai_cht_pftB)), lai_cht_pftB, label='lai')
+    LAIaxB.legend(loc='best', fancybox=True)
 
   # Nitrogen subplot...
   avln = dsA.variables['AVLN']
