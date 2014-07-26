@@ -43,11 +43,14 @@ def main():
     print_file_summary(args)
     sys.exit(0)
 
+
+  validate_outputnc_file(args.inputfile)
+
   print "Loading dataset..."
   dsA = nc.Dataset(args.inputfile)
   if (args.compare != None):
     dsB = nc.Dataset(args.compare)
-  
+
   pftidx = args.pft
   chtidx = args.cohortindex
   
@@ -61,7 +64,6 @@ def main():
   # General plot settings...
   #
   plt.rcParams['figure.figsize'] = 7.5, 10 # w, h
-   
   # get a figure instance and an axes instance for each subplot
   fig, (Cax, LAIax, Nax, SOILCax, SOILax, VWCax) = plt.subplots(nrows=6, ncols=1)
   fig.subplots_adjust(hspace=.5)
@@ -71,8 +73,7 @@ def main():
   (A) %s
   ''' % (args.inputfile)
   if args.compare:
-    title = title + '''
-    (B) %s
+    title = title + ''' (B) %s
     ''' % (args.compare)
   title = title + '''(Cohort Index: %s) (PFT: %s)''' % (args.cohortindex, args.pft)  
   fig.suptitle(title)
@@ -181,6 +182,17 @@ def main():
 #
 # Utility functions...
 #
+def validate_outputnc_file(file):
+  ds = nc.Dataset(file)
+
+  try:
+    # check correct dimensions
+    assert set(ds.dimensions.keys()) == set(['PFTS', 'CHTID', 'YEAR', 'YYYYMM'])
+
+  except AssertionError as e:
+    print "Problem with NetCDF file shape!", e
+
+
 def print_file_summary(args):
   print "Loading dataset(s)..."
   dsA = nc.Dataset(args.inputfile)
