@@ -110,21 +110,24 @@ def main(args):
 
 
     logging.debug("Process each requested stage to stitch together...")
+    stage_end_indices = ''
     for stage in args.stitch:
-      existing_timedim_length = len(tmpdata.dimensions['tstep'])
+      seidx = len(tmpdata.dimensions['tstep'])
+      stage_end_indices += '%i ' % seidx # make space delimited string of end of stage
+                                 # indices
 
       logging.info("First getting time axis data...")
       if not 'YEAR' in tmpdata.variables:
         tmpdata.createVariable('YEAR', 'f', dsA.variables['YEAR'].dimensions)
 
-      tmpdata.variables['YEAR'][existing_timedim_length:] = get_more_data(stage, 'YEAR', args)
+      tmpdata.variables['YEAR'][seidx:] = get_more_data(stage, 'YEAR', args)
 
       logging.info("Next, getting all other variables in the var set...")
       for v in varsets[args.varset]:
         if not v in tmpdata.variables:
           tmpdata.createVariable(v, 'f', dsA.variables[v].dimensions)
         if dsA.variables[v].dimensions[0] == 'tstep':
-          tmpdata.variables[v][existing_timedim_length:] = get_more_data(stage, v, args)
+          tmpdata.variables[v][seidx:] = get_more_data(stage, v, args)
           logging.info("tmpdata.variables[%s].shape: %s" % (v, tmpdata.variables[v].shape))
 
     del dsA
@@ -177,6 +180,12 @@ def main(args):
     logging.debug("setting the max number of ticks for x and y axes...")
     ax.yaxis.set_major_locator(MaxNLocator(nbins=4, prune='both'))
     ax.xaxis.set_major_locator(MaxNLocator(nbins=6, prune='both'))
+
+    if args.stitch:
+      logging.debug("Setting the end-of-stage marker lines...")
+      for seidx in stage_end_indices.split():
+        ax.axvline(seidx, color='red')
+
 
 
   for row in axar:
@@ -351,4 +360,7 @@ if __name__ == '__main__':
 
 
   main(args)
+
+
+
 
