@@ -317,36 +317,37 @@ if __name__ == '__main__':
   logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 
   parser = argparse.ArgumentParser(description=textwrap.dedent('''\
-      Plot a cmt***_***-**.nc file from dvmdostem.'''))
+      Plots a cmt***_***-**.nc file from dvmdostem. The script has three 
+      different "variable sets" it can plot (C, N, E) related to Carbon, 
+      Nitrogen, Environmental variables respectively. The script can optionally 
+      stitch data from other cmt***_***-**.nc files onto the end of the plot 
+      (plot data from multiple files consecutively on one time series/axis).'''))
 
   parser.add_argument('-r', '--report', action='store_true',
       help=textwrap.dedent('''\
-      Report on the input file. List dimensions and year range of file...show 
-      run stage, and show time resolution?'''))
+      Read the input netCDF file, reporting on the runstage, time resolution,
+      and dimensions of the file. Deduces runstage and time resolution from 
+      file name.'''))
 
   parser.add_argument('-p', '--pft', default=0, required=False, type=int, metavar='N',
-      help="Which pft to show (0-9)")
+      help="For pft variables, which pft to show (0-9)")
 
   parser.add_argument('-v', '--varset', default='C', choices=['C','N','E'],
       help="Choose the 'variable set' to plot (Carbon, Nitrogen, Environmental")
 
   parser.add_argument('-d', '--display', action='store_true',
       help="Display the plot")
-  parser.add_argument('-s', '--save', action='store_true', default=False, 
+  parser.add_argument('-s', '--save', action='store_true',
       help="Save the plot with generic name. Warning: will overwrite existing file with same name!!")
-
-
-
-  #group = parser.add_mutually_exclusive_group()
-  #group.add_argument('-n', '--normal', action="store_true")
-  #group.add_argument('-e', '--explorer', action="store_true")
 
 #  parser.add_argument('-s', '--startyr', default=0, required=False, type=int, metavar='N',
 #      help="Which year to start with. Defaults to 0, for all years. (will show env only warmup)")
 #  parser.add_argument('-e', '--endyr', default=None, required=False, type=int, metavar='N',
 #      help="Which year to end with. Defaults to None, for all years. (will read everything in the file)")
 
-  parser.add_argument('inputfile', help="path to a NetCDF file (A) to read from.")
+  parser.add_argument('inputfile', help=textwrap.dedent(''' Path to a 
+      cmtxxx_xxx-xx.nc file produced by dvmdostem.'''))
+
   parser.add_argument('--stitch', required=False,
       nargs='+',
       help=textwrap.dedent('''\
