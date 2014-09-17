@@ -22,8 +22,9 @@ class PlotBuilder(object):
   dataset = None
   
   def __del__(self):
-    print self.__class__.__name__, " dtor; closing dataset..."
-    self.dataset.close()
+    pass
+    #print self.__class__.__name__, " dtor; closing dataset..."
+    #self.dataset.close()
 
   def getDataset(self, filename):
     self.dataset = nc.Dataset(filename, 'r')
@@ -33,6 +34,11 @@ class PlotBuilder(object):
   def teardown(self):
     raise
 
+def guess_stage(filename):
+  guess = filename[-5:-2]
+  assert not guess in ('eq','sp','tr','sc'), "Unable to determine runstage from file name! %s" % filename
+  return guess
+
 
 class TimeSeriesBuilder(PlotBuilder):
   '''
@@ -40,15 +46,71 @@ class TimeSeriesBuilder(PlotBuilder):
   '''
   def __init__(self):
     print "Constructing a %s" % self.__class__.__name__
-    pass
 
   def some_random_build_step(self):
     print "Doing some random build step within a ", self.__class__.__name__
 
-  def build(self, config):
-    self.getDataset('output-sp.nc')
-    config_list = parse_configstringA(config)
+  def initialize( self, configstring ):
+    self.traces = parse_configstringA( configstring )
+    print "Checking the trace list..."
+    keys = ['varname', 'units', 'axnum', 'axside']
+    for entry in self.traces:
+      for key in keys:
+        if not key in entry.keys():
+          print "Invalid config string for this builder!"
 
+  def setup_grid(self):
+    pass
+
+  def setup_data(self):
+    fname = 'latest-output-xx.nc'
+    dataset = nc.Dataset(fname, 'r')
+    print "A %s object opened the file " % self.__class__.__name__, fname
+
+
+    rows = len(set([i['axnum'] for i in self.traces]))
+    self.fig, self.axes = plt.subplots(nrows=rows, ncols=1)
+
+    chtidx = 0
+    pftidx = 0
+
+    for trace in self.traces:
+      #from IPython import embed; embed()
+      ax = self.axes[trace['axnum']]
+      dimensions = dataset.variables[trace['varname']].dimensions
+      #print dimensions
+
+      if dimensions == ('CHTID', 'YYYYMM', 'PFTS'):
+        data = dataset.variables[trace['varname']][chtidx, :, trace['pft']]
+      elif dimensions == ('CHTID', 'YYYYMM'):
+        data = dataset.variables[trace['varname']][chtidx, :]
+      
+      ax.plot(np.arange(0, len(data)), data, label=trace['varname'])
+
+
+
+
+  def setup_axes_looks(self):
+    pass
+
+  def setup_legends(self):
+    pass
+
+  def setup_titles(self):
+    pass
+
+  def setup_overall_size(self):
+    pass
+
+  def finalize(self):
+    '''Returns a matplotlib figure instance and list of axes instances.'''
+    return self.fig, self.axes
+
+  def build(self, config):
+    '''Returns a matplotlib Figure and a list of Axes'''
+    fname = 'latest-output-xx.nc'
+    self.getDataset(fname)
+    config_list = parse_configstringA(config)
     self.some_random_build_step()
     
     print "Checking config list..."
@@ -86,8 +148,8 @@ class TimeSeriesBuilder(PlotBuilder):
 class Plotter(object):
   '''
   The director class, this class maintains a concrete builder.'''
-  def __init__(self):
-    self.builder = None
+  def __init__(self, builder_instance=None):
+    self.builder = builder_instance
 
   def create(self, config):
     '''
@@ -98,7 +160,18 @@ class Plotter(object):
     # could return the result of building...
     # not quite sure what I am going to end up with yet
     # maybe the whole plt.fig??
-    self.fig, self.axes = self.builder.build(config)
+
+    self.builder.initialize(config)
+    self.builder.setup_data()
+    self.builder.setup_axes_looks()
+    self.builder.setup_legends()
+    self.builder.setup_titles()
+    self.builder.setup_overall_size()
+    self.builder.setup_grid()
+
+    self.fig, self.axes = self.builder.finalize()
+  
+  
 
   def display(self):
     plt.show()
@@ -106,6 +179,16 @@ class Plotter(object):
   def save(self):
     #from IPython import embed; embed()
     plt.savefig("junk")
+
+
+
+
+
+
+def probe_query_report_dataset(dataset):
+  d = {}
+  d['stage'] = guess_stage(d)
+  return
 
 
 def parse_configstringA(configstr):
@@ -130,11 +213,12 @@ def parse_configstringA(configstr):
           d['axside'] = tokens[3]
         if len(tokens) >= 5:
           d['pft'] = int(tokens[4])
-        if len(tokens) == 6:
-          d['pftpart'] = tokens[5]
+#        if len(tokens) == 6:
+#          d['pftpart'] = tokens[5]
         dl.append(d)
 
 
+  print dl
   return dl
 
 
@@ -153,11 +237,10 @@ def main():
   TSHLW   "deg C"     1         R
   ''')
   
-  plotter = Plotter()
-  plotter.builder = TimeSeriesBuilder()
+  plotter = Plotter( TimeSeriesBuilder() )
   plotter.create(configstr)
   plotter.save()
-  #plotter.display()
+  plotter.display()
 
 
 #  from IPython import embed
