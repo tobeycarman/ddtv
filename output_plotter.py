@@ -8,31 +8,32 @@ import abc
 import textwrap
 import shlex
 
+import logging
+
 import netCDF4 as nc
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 
 class PlotBuilder(object):
   '''
   An abstract builder class. Concrete builders should derive from this.
   '''
-  __metadata__ = abc.ABCMeta
+  __metaclass__ = abc.ABCMeta
 
   dataset = None
   
   def __del__(self):
     pass
-    #print self.__class__.__name__, " dtor; closing dataset..."
-    #self.dataset.close()
-
-  def getDataset(self, filename):
-    self.dataset = nc.Dataset(filename, 'r')
-    print "A %s object opened a file: " % self.__class__.__name__, filename
 
   @abc.abstractmethod
-  def teardown(self):
-    raise
+  def initialize(self):
+    pass
+
+  @abc.abstractmethod
+  def finalize(self):
+    pass
 
 def guess_stage(filename):
   guess = filename[-5:-2]
@@ -45,19 +46,20 @@ class TimeSeriesBuilder(PlotBuilder):
   Makes a simple timeseries plot...
   '''
   def __init__(self):
-    print "Constructing a %s" % self.__class__.__name__
-
-  def some_random_build_step(self):
-    print "Doing some random build step within a ", self.__class__.__name__
+    logging.info("Constructing a %s" % self.__class__.__name__)
 
   def initialize( self, configstring ):
     self.traces = parse_configstringA( configstring )
-    print "Checking the trace list..."
+    logging.info("Checking the trace list...")
     keys = ['varname', 'units', 'axnum', 'axside']
-    for entry in self.traces:
+    for trace in self.traces:
       for key in keys:
-        if not key in entry.keys():
-          print "Invalid config string for this builder!"
+        if not key in trace.keys():
+          logging.warn("Invalid config string for this builder!")
+  
+    logging.debug("Printing the config string to stdout.")
+    print configstring
+
 
   def setup_grid(self):
     pass
@@ -65,37 +67,40 @@ class TimeSeriesBuilder(PlotBuilder):
   def setup_data(self):
     fname = 'latest-output-xx.nc'
     dataset = nc.Dataset(fname, 'r')
-    print "A %s object opened the file " % self.__class__.__name__, fname
-
+    logging.debug("A %s object opened the file %s" % (self.__class__.__name__, fname))
 
     rows = len(set([i['axnum'] for i in self.traces]))
     self.fig, self.axes = plt.subplots(nrows=rows, ncols=1)
 
+    self.fig.suptitle(fname)
+
     chtidx = 0
     pftidx = 0
 
+
+    logging.debug(self.traces)
+
     for trace in self.traces:
-      #from IPython import embed; embed()
       ax = self.axes[trace['axnum']]
       dimensions = dataset.variables[trace['varname']].dimensions
-      #print dimensions
 
       if dimensions == ('CHTID', 'YYYYMM', 'PFTS'):
         data = dataset.variables[trace['varname']][chtidx, :, trace['pft']]
+        l = '%s cht %s pft %s'%(trace['varname'], chtidx, trace['pft'] )
       elif dimensions == ('CHTID', 'YYYYMM'):
         data = dataset.variables[trace['varname']][chtidx, :]
+        l = '%s cht %s'%(trace['varname'], chtidx)
       
-      ax.plot(np.arange(0, len(data)), data, label=trace['varname'])
-
-
-
+      ax.plot(np.arange(0, len(data)), data, label=l)
 
   def setup_axes_looks(self):
     pass
+  
 
   def setup_legends(self):
-    pass
-
+    for ax in self.axes:
+      ax.legend()
+  
   def setup_titles(self):
     pass
 
@@ -105,45 +110,6 @@ class TimeSeriesBuilder(PlotBuilder):
   def finalize(self):
     '''Returns a matplotlib figure instance and list of axes instances.'''
     return self.fig, self.axes
-
-  def build(self, config):
-    '''Returns a matplotlib Figure and a list of Axes'''
-    fname = 'latest-output-xx.nc'
-    self.getDataset(fname)
-    config_list = parse_configstringA(config)
-    self.some_random_build_step()
-    
-    print "Checking config list..."
-    keys = ['varname', 'units', 'axnum', 'axside']
-    for entry in config_list:
-      for key in keys:
-        if not key in entry.keys():
-          print "Invalid config for this builder!"
-  
-    rows = len(set([i['axnum'] for i in config_list]))
-    fig, axes = plt.subplots(nrows=rows, ncols=1)
-
-    chtidx = 0
-    pftidx = 0
-
-    for item in config_list:
-      #from IPython import embed; embed()
-      ax = axes[item['axnum']]
-      dimensions = self.dataset.variables[item['varname']].dimensions
-      print dimensions
-      if dimensions == ('CHTID', 'YYYYMM', 'PFTS'):
-        data = self.dataset.variables[item['varname']][chtidx, :, item['pft']]
-      elif dimensions == ('CHTID', 'YYYYMM'):
-        data = self.dataset.variables[item['varname']][chtidx, :]
-
-      ax.plot(np.arange(0, len(data)), data, label=item['varname'])
-
-    return fig, axes
-    
-
-  def teardown(self):
-    print "Doing some teardown...in derived class override method"
-
 
 class Plotter(object):
   '''
@@ -157,6 +123,8 @@ class Plotter(object):
     Precondition: not self.builder is None
     '''
     assert not self.builder is None, "No defined builder!"
+   
+   
     # could return the result of building...
     # not quite sure what I am going to end up with yet
     # maybe the whole plt.fig??
@@ -170,9 +138,15 @@ class Plotter(object):
     self.builder.setup_grid()
 
     self.fig, self.axes = self.builder.finalize()
-  
+    # do more stuff with fig and axes??
   
 
+  def interactive_display(self):
+    plt.ion()
+    logging.debug("Run plt.show() to show the plot!")
+    from IPython import embed; embed()
+  
+  
   def display(self):
     plt.show()
 
@@ -199,10 +173,11 @@ def parse_configstringA(configstr):
       pass # comments, empty, lines
     else:
       tokens = shlex.split(line) # lets us use quoted strings.
-      print "found %s tokens: "%len(tokens), tokens
+      logging.debug("found %s tokens: " % len(tokens))
+      logging.debug("Tokens: %s " % tokens)
 
       if len(tokens) not in [4,5,6]:
-        print "Error parsing config string! Invalid number of tokens: %s" % len(tokens)
+        logging.debug("Error parsing config string! Invalid number of tokens: %s" % len(tokens))
       else:
 
         # assign some data values based on columns
@@ -218,13 +193,24 @@ def parse_configstringA(configstr):
         dl.append(d)
 
 
-  print dl
+  logging.debug(dl)
   return dl
 
 
 
 def main():
-  print "Hello, starting to make some plots..."
+
+
+  print "Setting up logging..."
+  LOG_FORMAT = '%(levelname)-7s %(name)-8s %(message)s'
+  numeric_level = getattr(logging, 'DEBUG')
+  #numeric_level = getattr(logging, loglevel.upper(), None)
+  if not isinstance(numeric_level, int):
+    raise ValueError('Invalid log level: %s' % loglevel)
+
+  logging.basicConfig(level=numeric_level, format=LOG_FORMAT)
+
+  logging.debug("Hello, starting to make some plots...")
   
   configstr = textwrap.dedent('''\
   # var     units     axnum  axside  pft pftpart
@@ -240,7 +226,7 @@ def main():
   plotter = Plotter( TimeSeriesBuilder() )
   plotter.create(configstr)
   plotter.save()
-  plotter.display()
+  plotter.interactive_display()
 
 
 #  from IPython import embed
