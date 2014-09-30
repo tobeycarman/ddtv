@@ -21,6 +21,8 @@ import matplotlib.gridspec as gridspec
 
 import collections
 
+import logging
+
 
 # turns out there is no need to use this - just get a numpy array straight
 # from a netcdf variable, slice, and then reshape as needed.
@@ -48,98 +50,134 @@ def flat_gen(x):
 # try it out:
 #print(list(flat_gen(["junk",["nested stuff"],[],[[[],['deep']]]])))
 
+print "Finding all variables that are in terms of each 3D dimension group..."
+
+def plot_3d_groups(dataset, dimension_group, gs, row=0):
+  #from IPython import embed; embed()
+  for i, dim_grp in enumerate(dimension_group):
+    print "Axes {0:}  {1:}".format(i, dim_grp)
+    vars = [var for var in dataset.variables if dataset.variables[var].dimensions == dim_grp]
+    
+    ax = plt.subplot(gs[row,i])
+
+    s = dataset.variables[vars[0]].shape
+    flatdata = np.vstack( (dataset.variables[vars[0]][:].reshape((s[0]*s[1], s[2]))) )
+    for j, v in enumerate(vars):
+      print "  {0:} {1:}".format(v, dataset.variables[v].shape)
+      
+      s = dataset.variables[v].shape
+      flatdata = np.vstack( (flatdata, dataset.variables[v][:].reshape((s[0]*s[1], s[2]))) )
+  
+    #ax.set_xlabel("%s, %s" % (dim_grp[0], dim_grp[1]))
+    ax.set_xticks(())
+    ax.set_xticklabels(())
+    
+    #ax.set_ylabel("%i" % i)
+    #ax.set_yticks( range(0, len(vars)) )
+    ax.set_yticklabels(())
+    
+    print "shape of image being plotted:", flatdata.shape
+    plt.imshow(dataset.variables[v][:].reshape((s[0]*s[1], s[2])), aspect=1.0, interpolation='none')
+
+
+
+def plot_2d_groups(dataset, dimension_group, gs, col=0):
+  
+  logging.info("Finding all variables that are in terms of each 2D dimension group...")
+  for i, dim_grp in enumerate(dimension_group):
+    print "Axes {0:}  {1:}".format(i, dim_grp)
+    vars = [var for var in dataset.variables if dataset.variables[var].dimensions == dim_grp]
+    
+    ax = plt.subplot(gs[i,col])
+    
+    flatdata = list(itertools.chain.from_iterable( dataset.variables[vars[0]] ))
+    for j, v in enumerate(vars):
+      print "  {0:} {1:}".format(v, dataset.variables[v].shape)
+      if not j == 0:
+        flatdata = np.vstack( (flatdata, list(itertools.chain.from_iterable( dataset.variables[vars[j]]))) )
+      else:
+        pass # already added the first var's data ouside loop
+  
+    #ax.set_title("??")
+    
+    ax.set_xlabel("%s, %s" % (dim_grp[0], dim_grp[1]))
+    ax.set_xticks(())
+    ax.set_xticklabels(())
+    
+    ax.set_ylabel("%i" % i)
+    ax.set_yticks( range(0, len(vars)) )
+    ax.set_yticklabels(())
+    
+    print "shape of image being plotted:", flatdata.shape
+    plt.imshow(flatdata, interpolation='none', aspect=1.0) # 4 -> height is 4x the width
+
 
 
 def main(fileA, compareFile):
-
+  logging.basicConfig(level=logging.DEBUG)
+  logging.info("Loading dataset(s)")
   dsA = nc.Dataset(fileA)
   if compareFile:
-    print "WARNING - NOT IMPLEMENTED YET!!"
+    print "WARNING - COMPARE FEATURE NOT FULLY IMPLEMENTED YET!!"
     dsB = nc.Dataset(compareFile)
 
+
+  logging.info("Finding set of 'dimension groups' that covers all variable in the file")
   # make a list of dimesions for every variable in the file
   # reduce to a set of 'dimension groups' that covers all variables in each file
   dim_grpA = set( [dsA.variables[v].dimensions for v in dsA.variables] )
 
   if compareFile:
-    dim_grpB = set([dsB.variables[v].dimensions for v in dsB.varables])
+    dim_grpB = set( [dsB.variables[v].dimensions for v in dsB.variables] )
     if dim_grpA != dim_grpB:
-      print "WARNING! The two files don't seem to have the same variables/dimensions!"
+      logging.warn(")The two files don't seem to have the same variables/dimensions!")
 
+  logging.info("Separating dimension groups into 2D group and 3D group")
   dim_grpA_2D = [g for g in dim_grpA if len(g) == 2]
   dim_grpA_3D = [g for g in dim_grpA if len(g) == 3]
 
-  print "2D dimension groups: ", dim_grpA_2D
-  print "3D dimension groups: ", dim_grpA_3D
+  if compareFile:
+    dim_grpB_2D = [g for g in dim_grpB if len(g) == 2]
+    dim_grpB_3D = [g for g in dim_grpB if len(g) == 3]
+    if (dim_grpA_2D != dim_grpB_2D) or (dim_grpA_3D != dim_grpB_3D):
+      logging.warn("Problem with not matching between two files!")
+
+  logging.info("2D dimension groups: %s" % dim_grpA_2D)
+  logging.info("3D dimension groups: %s" % dim_grpA_3D)
 
   # Set up figure for 2D image plots
   gs = gridspec.GridSpec( len(dim_grpA_2D), 1 )
+  if compareFile:
+    gs = gridspec.GridSpec( len(dim_grpB_2D), 2 )
+
   fig = plt.figure()
   fig.suptitle("2D variables for %s" % args.file)
 
-  print "Finding all variables that are in terms of each 2D dimension group..."
-  for i, dim_grp in enumerate(dim_grpA_2D):
-    print "Axes {0:}  {1:}".format(i, dim_grp)
-    vars = [var for var in dsA.variables if dsA.variables[var].dimensions == dim_grp]
+  plot_2d_groups(dsA, dim_grpA_2D, gs, col=0)
 
-    ax = plt.subplot(gs[i])
-
-    flatdata = list(itertools.chain.from_iterable( dsA.variables[vars[0]] ))
-    for j, v in enumerate(vars):
-      print "  {0:} {1:}".format(v, dsA.variables[v].shape)
-      if not j == 0:
-        flatdata = np.vstack( (flatdata, list(itertools.chain.from_iterable( dsA.variables[vars[j]]))) )
-      else:
-        pass # already added the first var's data ouside loop
-
-    #ax.set_title("??")
-
-    ax.set_xlabel("%s, %s" % (dim_grp[0], dim_grp[1]))
-    ax.set_xticks(())
-    ax.set_xticklabels(())
-
-    ax.set_ylabel("%i" % i)
-    ax.set_yticks( range(0, len(vars)) )
-    ax.set_yticklabels(())
-
-    print "shape of image being plotted:", flatdata.shape
-    plt.imshow(flatdata, interpolation='none', aspect=1.0) # 4 -> height is 4x the width
+  if compareFile:
+    plot_2d_groups(dsB, dim_grpB_2D, gs, col=1)
 
   plt.show()
 
 
 
   gs = gridspec.GridSpec( 1, len(dim_grpA_3D) )
+  if compareFile:
+    gs = gridspec.GridSpec( 2, len(dim_grpB_3D) )
+
   fig = plt.figure()
   fig.suptitle("3D variables for %s" % args.file)
-  print "Finding all variables that are in terms of each 3D dimension group..."
 
-  #from IPython import embed; embed()
-  for i, dim_grp in enumerate(dim_grpA_3D):
-    print "Axes {0:}  {1:}".format(i, dim_grp)
-    vars = [var for var in dsA.variables if dsA.variables[var].dimensions == dim_grp]
+  plot_3d_groups(dsA, dim_grpA_3D, gs, row=0)
 
-    ax = plt.subplot(gs[i])
-    s = dsA.variables[vars[0]].shape
-    flatdata = np.vstack( (dsA.variables[vars[0]][:].reshape((s[0]*s[1], s[2]))) )
-    for j, v in enumerate(vars):
-      print "  {0:} {1:}".format(v, dsA.variables[v].shape)
-
-      s = dsA.variables[v].shape
-      flatdata = np.vstack( (flatdata, dsA.variables[v][:].reshape((s[0]*s[1], s[2]))) )
-
-    #ax.set_xlabel("%s, %s" % (dim_grp[0], dim_grp[1]))
-    ax.set_xticks(())
-    ax.set_xticklabels(())
-
-    #ax.set_ylabel("%i" % i)
-    #ax.set_yticks( range(0, len(vars)) )
-    ax.set_yticklabels(())
-
-    print "shape of image being plotted:", flatdata.shape
-    plt.imshow(dsA.variables[v][:].reshape((s[0]*s[1], s[2])), aspect=1.0, interpolation='none')
+  if compareFile:
+    plot_3d_groups(dsB, dim_grpB_3D, gs, row=1)
 
   plt.show()
+
+
+
 
 if __name__ == '__main__':
   
