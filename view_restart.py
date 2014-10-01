@@ -55,7 +55,7 @@ print "Finding all variables that are in terms of each 3D dimension group..."
 def plot_3d_groups(dataset, dimension_group, gs, row=0):
   #from IPython import embed; embed()
   for i, dim_grp in enumerate(dimension_group):
-    print "Axes {0:}  {1:}".format(i, dim_grp)
+    logging.info("Axes {0:}  {1:}".format(i, dim_grp))
     vars = [var for var in dataset.variables if dataset.variables[var].dimensions == dim_grp]
     
     ax = plt.subplot(gs[row,i])
@@ -63,21 +63,26 @@ def plot_3d_groups(dataset, dimension_group, gs, row=0):
     s = dataset.variables[vars[0]].shape
     flatdata = np.vstack( (dataset.variables[vars[0]][:].reshape((s[0]*s[1], s[2]))) )
     for j, v in enumerate(vars):
-      print "  {0:} {1:}".format(v, dataset.variables[v].shape)
+      logging.info("  {0:} {1:}".format(v, dataset.variables[v].shape))
       
       s = dataset.variables[v].shape
       flatdata = np.vstack( (flatdata, dataset.variables[v][:].reshape((s[0]*s[1], s[2]))) )
   
-    #ax.set_xlabel("%s, %s" % (dim_grp[0], dim_grp[1]))
+    ax.set_xticklabels(())
     ax.set_xticks(())
     ax.set_xticklabels(())
     
-    #ax.set_ylabel("%i" % i)
-    #ax.set_yticks( range(0, len(vars)) )
+    ax.set_title( "(%s)" % ('A' if (row==0) else 'B') )
+    ax.set_yticks(())
     ax.set_yticklabels(())
+    #ax.set_yticks( range(0, len(vars)) )
+    ax.set_ylabel("%s, %s, %s" % (dim_grp[0], dim_grp[1], dim_grp[2]))
     
-    print "shape of image being plotted:", flatdata.shape
-    plt.imshow(dataset.variables[v][:].reshape((s[0]*s[1], s[2])), aspect=1.0, interpolation='none')
+    logging.info("(rows, cols) of image being plotted: %s" % ["%s"%i for i in flatdata.shape])
+    
+    #from IPython import embed; embed()
+    
+    plt.imshow(dataset.variables[v][:].reshape((s[0]*s[1], s[2])), aspect=1.0, interpolation='nearest')
 
 
 
@@ -85,14 +90,19 @@ def plot_2d_groups(dataset, dimension_group, gs, col=0):
   
   logging.info("Finding all variables that are in terms of each 2D dimension group...")
   for i, dim_grp in enumerate(dimension_group):
-    print "Axes {0:}  {1:}".format(i, dim_grp)
+    logging.info("Axes {0:}  {1:}".format(i, dim_grp))
     vars = [var for var in dataset.variables if dataset.variables[var].dimensions == dim_grp]
-    
+
+#    if len(plt.gcf().axes) > 1:
+#      ax = plt.subplot(gs[i,col], sharex=plt.gcf().axes[0])
+#    else:
+#      ax = plt.subplot(gs[i,col])
+
     ax = plt.subplot(gs[i,col])
-    
+
     flatdata = list(itertools.chain.from_iterable( dataset.variables[vars[0]] ))
     for j, v in enumerate(vars):
-      print "  {0:} {1:}".format(v, dataset.variables[v].shape)
+      logging.info( "  {0:} {1:}".format(v, dataset.variables[v].shape) )
       if not j == 0:
         flatdata = np.vstack( (flatdata, list(itertools.chain.from_iterable( dataset.variables[vars[j]]))) )
       else:
@@ -108,8 +118,12 @@ def plot_2d_groups(dataset, dimension_group, gs, col=0):
     ax.set_yticks( range(0, len(vars)) )
     ax.set_yticklabels(())
     
-    print "shape of image being plotted:", flatdata.shape
-    plt.imshow(flatdata, interpolation='none', aspect=1.0) # 4 -> height is 4x the width
+    logging.info("(rows, cols) of image being plotted: %s" % ["%s"%i for i in flatdata.shape])
+    #from IPython import embed; embed()
+    plt.imshow(flatdata, interpolation='nearest', aspect=1.0) # 4 -> height is 4x the width
+    if len(plt.gcf().axes) > 1:
+      plt.imshow(flatdata, interpolation='nearest', aspect=1.0) # 4 -> height is 4x the width
+
 
 
 
@@ -151,7 +165,11 @@ def main(fileA, compareFile):
     gs = gridspec.GridSpec( len(dim_grpB_2D), 2 )
 
   fig = plt.figure()
-  fig.suptitle("2D variables for %s" % args.file)
+  fig.suptitle("2D variables for %s" % fileA)
+  if compareFile:
+    fig.suptitle(textwrap.dedent('''2D variables for
+        (A) %s
+        (B) %s''' % (fileA, compareFile)))
 
   plot_2d_groups(dsA, dim_grpA_2D, gs, col=0)
 
@@ -167,10 +185,13 @@ def main(fileA, compareFile):
     gs = gridspec.GridSpec( 2, len(dim_grpB_3D) )
 
   fig = plt.figure()
-  fig.suptitle("3D variables for %s" % args.file)
+  fig.suptitle("3D variables for %s" % fileA)
+  if compareFile:
+    fig.suptitle(textwrap.dedent('''3D variables for
+      (A) %s
+      (B) %s''' % (fileA, compareFile)))
 
   plot_3d_groups(dsA, dim_grpA_3D, gs, row=0)
-
   if compareFile:
     plot_3d_groups(dsB, dim_grpB_3D, gs, row=1)
 
