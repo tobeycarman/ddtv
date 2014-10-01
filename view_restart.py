@@ -132,7 +132,6 @@ def main(fileA, compareFile):
   logging.info("Loading dataset(s)")
   dsA = nc.Dataset(fileA)
   if compareFile:
-    print "WARNING - COMPARE FEATURE NOT FULLY IMPLEMENTED YET!!"
     dsB = nc.Dataset(compareFile)
 
 
@@ -217,7 +216,7 @@ if __name__ == '__main__':
       help="A file to show")
 
   parser.add_argument('--compare', default=None,
-      help='path to a NetCDF file to compare to (B). NOT IMPLEMENTED YET!')
+      help='path to a NetCDF file (B) to plot for comparison')
 
   print "Parsing command line arguments..."
   args = parser.parse_args()
