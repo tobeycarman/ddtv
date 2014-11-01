@@ -104,11 +104,11 @@ def main():
   npp_cht_pft = npp[chtidx, :, pftidx]
 
   Cax.plot(np.arange(0,len(vegc_cht_pft)), vegc_cht_pft, color='k', label='vegc')
-  Cax.legend(loc='upper left', fancybox=True)
+  Cax.legend(fontsize='small', loc='upper left', fancybox=True)
 
   Cax1 = Cax.twinx()
   Cax1.plot(np.arange(0,len(npp_cht_pft)), npp_cht_pft, color='r', label='npp')
-  Cax1.legend(loc='upper right', fancybox=True)
+  Cax1.legend(fontsize='small', loc='upper right', fancybox=True)
 
   if args.compare:
     vegcB = dsB.variables['VEGC']
@@ -118,36 +118,37 @@ def main():
     npp_cht_pftB = nppB[chtidx, :, pftidx]
 
     CaxB.plot(np.arange(0,len(vegc_cht_pftB)), vegc_cht_pftB, color='k', label='vegc')
-    CaxB.legend(loc='upper left', fancybox=True)
+    CaxB.legend(fontsize='small', loc='upper left', fancybox=True)
 
     CaxB1 = CaxB.twinx()
     CaxB1.plot(np.arange(0,len(npp_cht_pftB)), npp_cht_pftB, color='r', label='npp')
-    CaxB1.legend(loc='upper right', fancybox=True)
 
+    CaxB1.legend(fontsize='small', loc='upper right', fancybox=True)
+    
 
   # Lai subplot...
   lai = dsA.variables['LAI']
   lai_cht_pft = lai[chtidx, :, pftidx]
   LAIax.plot(np.arange(0, len(lai_cht_pft)), lai_cht_pft, label='lai')
-  LAIax.legend(loc='best', fancybox=True)
+  LAIax.legend(fontsize='small', loc='best', fancybox=True)
   if args.compare:
     laiB = dsB.variables['LAI']
     lai_cht_pftB = laiB[chtidx, :, pftidx]
     LAIaxB.plot(np.arange(0, len(lai_cht_pftB)), lai_cht_pftB, label='lai')
-    LAIaxB.legend(loc='best', fancybox=True)
+    LAIaxB.legend(fontsize='small', loc='best', fancybox=True)
 
   # Nitrogen subplot...
   avln = dsA.variables['AVLN']
   avln_cht = avln[chtidx, :]
   #nuptake_cht = ??? #<- not sure what variable this is...not in variable list?
   Nax.plot(np.arange(0, len(avln_cht)), avln_cht, label='avln')
-  Nax.legend(loc='best', fancybox=True)
+  Nax.legend(fontsize='small', loc='best', fancybox=True)
   if args.compare:
     avlnB = dsB.variables['AVLN']
     avln_chtB = avlnB[chtidx, :]
     #nuptake_cht = ??? #<- not sure what variable this is...not in variable list?
     NaxB.plot(np.arange(0, len(avln_chtB)), avln_chtB, label='avln')
-    NaxB.legend(loc='best', fancybox=True)
+    NaxB.legend(fontsize='small', loc='best', fancybox=True)
 
   
   # Soil C subplot (I have no idea if these are the right variabels...??)
@@ -163,7 +164,7 @@ def main():
   SOILCax.plot(np.arange(0, len(oshlwc_cht)), oshlwc_cht, label='oshlwc')
   SOILCax.plot(np.arange(0, len(odeepc_cht)), odeepc_cht, label='odeepc')
   SOILCax.plot(np.arange(0, len(mineac_cht)), mineac_cht, label='mineac')
-  SOILCax.legend(loc='best', fancybox=True)
+  SOILCax.legend(fontsize='small', loc='best', fancybox=True)
   if args.compare:
     oshlwcB = dsB.variables['OSHLWC']
     oshlwc_chtB = oshlwcB[chtidx, :]
@@ -177,7 +178,7 @@ def main():
     SOILCaxB.plot(np.arange(0, len(oshlwc_chtB)), oshlwc_chtB, label='oshlwc')
     SOILCaxB.plot(np.arange(0, len(odeepc_chtB)), odeepc_chtB, label='odeepc')
     SOILCaxB.plot(np.arange(0, len(mineac_chtB)), mineac_chtB, label='mineac')
-    SOILCaxB.legend(loc='best', fancybox=True)
+    SOILCaxB.legend(fontsize='small', loc='best', fancybox=True)
 
   
 
@@ -194,7 +195,7 @@ def main():
   SOILax.plot(np.arange(0, len(ald_cht)), ald_cht, label='ald')
   SOILax.plot(np.arange(0, len(eet_cht)), eet_cht, label='eet')
   SOILax.plot(np.arange(0, len(tshlw_cht)), tshlw_cht, label='tshlw')
-  SOILax.legend(loc='best')
+  SOILax.legend(fontsize='small', loc='best')
 
   if args.compare:
     aldB = dsB.variables['ALD']
@@ -209,7 +210,7 @@ def main():
     SOILaxB.plot(np.arange(0, len(ald_chtB)), ald_chtB, label='ald')
     SOILaxB.plot(np.arange(0, len(eet_chtB)), eet_chtB, label='eet')
     SOILaxB.plot(np.arange(0, len(tshlw_chtB)), tshlw_chtB, label='tshlw')
-    SOILaxB.legend(loc='best')
+    SOILaxB.legend(fontsize='small', loc='best')
 
 
 
@@ -234,7 +235,7 @@ def main():
   VWCax.plot(np.arange(0, len(vwcminea_cht)), vwcminea_cht, label='vwcmina')
   VWCax.plot(np.arange(0, len(vwcmineb_cht)), vwcmineb_cht, label='vwcminb')
   VWCax.plot(np.arange(0, len(vwcminec_cht)), vwcminec_cht, label='vwcminc')
-  VWCax.legend(loc='best')
+  VWCax.legend(fontsize='small', loc='best')
   if args.compare:
     vwcshlwB = dsB.variables['VWCSHLW']
     vwcshlw_chtB = vwcshlwB[chtidx, :]
@@ -256,7 +257,9 @@ def main():
     VWCaxB.plot(np.arange(0, len(vwcminea_chtB)), vwcminea_chtB, label='vwcmina')
     VWCaxB.plot(np.arange(0, len(vwcmineb_chtB)), vwcmineb_chtB, label='vwcminb')
     VWCaxB.plot(np.arange(0, len(vwcminec_chtB)), vwcminec_chtB, label='vwcminc')
-    VWCaxB.legend(loc='best')
+    VWCaxB.legend(fontsize='small', loc='best')
+
+
 
   if args.save:
     saved_file_name = "plot_general_diagnostics.png"
