@@ -8,6 +8,8 @@ import netCDF4 as nc
 import numpy as np
 import matplotlib.pyplot as plt
 
+from matplotlib.ticker import MaxNLocator
+
 def main():
 
   parser = argparse.ArgumentParser(description=textwrap.dedent('''\
@@ -259,6 +261,11 @@ def main():
     VWCaxB.plot(np.arange(0, len(vwcminec_chtB)), vwcminec_chtB, label='vwcminc')
     VWCaxB.legend(fontsize='small', loc='best')
 
+
+  # Set the maximum number of tick marks for ALL axes
+  for ax in fig.axes:
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=5, prune='upper'))
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=8, prune='upper'))
 
 
   if args.save:
