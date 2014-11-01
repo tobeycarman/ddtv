@@ -46,7 +46,7 @@ def main():
 
   validate_outputnc_file(args.inputfile)
 
-  print "Loading dataset..."
+  print "Loading dataset(s)..."
   dsA = nc.Dataset(args.inputfile)
   if (args.compare != None):
     dsB = nc.Dataset(args.compare)
@@ -87,7 +87,7 @@ def main():
     title = title + ''' (B) %s
     ''' % (args.compare)
   title = title + '''(Cohort Index: %s) (PFT: %s)''' % (args.cohortindex, args.pft)  
-  fig.suptitle(title)
+  fig.suptitle(title, linespacing=1.95)
 
   # Now work on each subplot. In general, the idea is:
   #  1) select data from the files(s)
