@@ -68,6 +68,8 @@ def main(args):
   dsA = nc.Dataset(args.inputfile)
   titlestring = "%s" % (args.inputfile)
 
+
+
   if args.stitch:
     logging.info("Attempting to stitch stages %s onto inputfile before displaying..." % (args.stitch))
 
@@ -337,16 +339,20 @@ if __name__ == '__main__':
 
   parser.add_argument('-d', '--display', action='store_true',
       help="Display the plot")
+      
   parser.add_argument('-s', '--save', action='store_true',
-      help="Save the plot with generic name. Warning: will overwrite existing file with same name!!")
+      help=textwrap.dedent('''\
+        Save the plot with generic name. Warning: will overwrite existing file 
+        with same name!!'''))
 
 #  parser.add_argument('-s', '--startyr', default=0, required=False, type=int, metavar='N',
 #      help="Which year to start with. Defaults to 0, for all years. (will show env only warmup)")
 #  parser.add_argument('-e', '--endyr', default=None, required=False, type=int, metavar='N',
 #      help="Which year to end with. Defaults to None, for all years. (will read everything in the file)")
 
-  parser.add_argument('inputfile', help=textwrap.dedent(''' Path to a 
-      cmtxxx_xxx-xx.nc file produced by dvmdostem.'''))
+  parser.add_argument('inputfile',
+      help=textwrap.dedent('''\
+        Path to a cmtxxx_xxx-xx.nc file produced by dvmdostem.'''))
 
   parser.add_argument('--stitch', required=False,
       nargs='+',
